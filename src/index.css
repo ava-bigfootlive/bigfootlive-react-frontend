@@ -1,0 +1,165 @@
+@import '@radix-ui/colors/plum.css';
+@import '@radix-ui/colors/plum-dark.css';
+@import '@radix-ui/colors/mauve.css';
+@import '@radix-ui/colors/mauve-dark.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Background colors using mauve for neutral */
+    --background: 0 0% 100%;
+    --foreground: var(--mauve-12);
+    
+    /* Card backgrounds */
+    --card: 0 0% 100%;
+    --card-foreground: var(--mauve-12);
+    
+    /* Popover/dropdown backgrounds */
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--mauve-12);
+    
+    /* Primary using plum colors */
+    --primary: var(--plum-9);
+    --primary-foreground: white;
+    
+    /* Secondary using lighter plum */
+    --secondary: var(--plum-3);
+    --secondary-foreground: var(--plum-11);
+    
+    /* Muted backgrounds */
+    --muted: var(--mauve-3);
+    --muted-foreground: var(--mauve-11);
+    
+    /* Accent colors */
+    --accent: var(--plum-4);
+    --accent-foreground: var(--plum-11);
+    
+    /* Destructive (errors) */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders */
+    --border: var(--mauve-6);
+    --input: var(--mauve-7);
+    --ring: var(--plum-8);
+    
+    /* Other */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode background colors */
+    --background: var(--mauve-1);
+    --foreground: var(--mauve-12);
+    
+    /* Dark card backgrounds */
+    --card: var(--mauve-2);
+    --card-foreground: var(--mauve-12);
+    
+    /* Dark popover backgrounds */
+    --popover: var(--mauve-2);
+    --popover-foreground: var(--mauve-12);
+    
+    /* Dark primary using plum */
+    --primary: var(--plum-9);
+    --primary-foreground: white;
+    
+    /* Dark secondary */
+    --secondary: var(--plum-3);
+    --secondary-foreground: var(--plum-11);
+    
+    /* Dark muted */
+    --muted: var(--mauve-3);
+    --muted-foreground: var(--mauve-11);
+    
+    /* Dark accent */
+    --accent: var(--plum-4);
+    --accent-foreground: var(--plum-11);
+    
+    /* Destructive remains same */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Dark borders */
+    --border: var(--mauve-6);
+    --input: var(--mauve-7);
+    --ring: var(--plum-8);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom BigfootLive styles */
+@layer components {
+  .bigfoot-gradient {
+    background: linear-gradient(135deg, var(--plum-9) 0%, var(--plum-11) 100%);
+  }
+  
+  .bigfoot-text-gradient {
+    background: linear-gradient(135deg, var(--plum-9) 0%, var(--plum-11) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .ava-avatar {
+    border-radius: 9999px;
+    background: linear-gradient(to bottom right, var(--plum-9), var(--plum-11));
+  }
+  
+  /* Custom scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
