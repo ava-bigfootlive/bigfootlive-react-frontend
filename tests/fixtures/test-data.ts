@@ -62,23 +62,23 @@ export const streamSettings = {
 export const apiEndpoints = {
   health: '/health',
   auth: {
-    login: '/api/auth/login',
-    logout: '/api/auth/logout',
-    register: '/api/auth/register',
-    refresh: '/api/auth/refresh'
+    login: '/api/v1/auth/login',
+    logout: '/api/v1/auth/logout',
+    register: '/api/v1/auth/register',
+    refresh: '/api/v1/auth/refresh'
   },
   streaming: {
-    start: '/api/streaming/start',
-    stop: '/api/streaming/stop',
-    status: '/api/streaming/status',
-    analytics: '/api/streaming/analytics'
+    start: '/api/v1/streaming/start',
+    stop: '/api/v1/streaming/stop',
+    status: '/api/v1/streaming/status',
+    analytics: '/api/v1/streaming/analytics'
   },
   events: {
-    list: '/api/events',
-    create: '/api/events',
-    details: '/api/events/:id',
-    update: '/api/events/:id',
-    delete: '/api/events/:id'
+    list: '/api/v1/events',
+    create: '/api/v1/events',
+    details: '/api/v1/events/:id',
+    update: '/api/v1/events/:id',
+    delete: '/api/v1/events/:id'
   }
 };
 

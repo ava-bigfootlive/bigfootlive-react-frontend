@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   Home,
-  Video,
+  Upload,
   Calendar,
   Users,
   BarChart3,
@@ -33,11 +33,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/streaming', label: 'Streaming', icon: Video },
+    { path: '/vod-upload', label: 'VOD/Assets', icon: Upload },
     { path: '/events', label: 'Events', icon: Calendar },
-    { path: '/users', label: 'User Management', icon: Users },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/chat', label: 'Chat', icon: MessageSquare },
+    { path: '/users', label: 'User Management', icon: Users },
     { path: '/docs', label: 'Documentation', icon: FileText },
   ];
 

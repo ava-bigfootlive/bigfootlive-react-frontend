@@ -8,7 +8,7 @@ import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import DashboardPage from './pages/Dashboard';
-import StreamingPage from './pages/Streaming';
+import VODUploadPage from './pages/VODUpload';
 import StreamingLivePage from './pages/StreamingLive';
 import PlatformAdminPage from './pages/PlatformAdmin';
 import SelectTenantPage from './pages/SelectTenant';
@@ -53,10 +53,10 @@ function App() {
           />
           
           <Route
-            path="/streaming"
+            path="/vod-upload"
             element={
               <ProtectedRoute>
-                <StreamingPage />
+                <VODUploadPage />
               </ProtectedRoute>
             }
           />
