@@ -1,9 +1,9 @@
+/* Import BigFootLive Design System */
+@import './styles/design-system.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import BigFootLive Design System */
-@import './styles/design-system.css';
 
 @layer base {
   :root {
@@ -104,7 +104,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
