@@ -118,40 +118,52 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quick Actions</h2>
+          <h2 className="text-headline" style={{ color: 'hsl(var(--foreground))' }}>Quick Actions</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button
             onClick={() => navigate('/streaming')}
-            className="h-20 text-left justify-start bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+            className="card-modern h-20 text-left justify-start transition-all duration-200 hover:card-elevated"
             variant="outline"
+            style={{
+              backgroundColor: 'hsl(var(--surface))',
+              borderColor: 'hsl(var(--border))',
+            }}
           >
-            <PlusCircle className="h-6 w-6 mr-3 text-purple-600 dark:text-purple-400" />
+            <PlusCircle className="h-6 w-6 mr-3" style={{ color: 'hsl(var(--brand-primary))' }} />
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">Create Event</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Start a new streaming event</div>
+              <div className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>Create Event</div>
+              <div className="text-sm" style={{ color: 'hsl(var(--foreground-secondary))' }}>Start a new streaming event</div>
             </div>
           </Button>
           <Button
             onClick={() => navigate('/streaming/live')}
-            className="h-20 text-left justify-start bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+            className="card-modern h-20 text-left justify-start transition-all duration-200 hover:card-elevated"
             variant="outline"
+            style={{
+              backgroundColor: 'hsl(var(--surface))',
+              borderColor: 'hsl(var(--border))',
+            }}
           >
-            <PlayCircle className="h-6 w-6 mr-3 text-green-600 dark:text-green-400" />
+            <PlayCircle className="h-6 w-6 mr-3" style={{ color: 'hsl(var(--success))' }} />
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">Go Live</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Start streaming now</div>
+              <div className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>Go Live</div>
+              <div className="text-sm" style={{ color: 'hsl(var(--foreground-secondary))' }}>Start streaming now</div>
             </div>
           </Button>
           <Button
             onClick={() => navigate('/analytics')}
-            className="h-20 text-left justify-start bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+            className="card-modern h-20 text-left justify-start transition-all duration-200 hover:card-elevated"
             variant="outline"
+            style={{
+              backgroundColor: 'hsl(var(--surface))',
+              borderColor: 'hsl(var(--border))',
+            }}
           >
-            <BarChart3 className="h-6 w-6 mr-3 text-blue-600 dark:text-blue-400" />
+            <BarChart3 className="h-6 w-6 mr-3" style={{ color: 'hsl(var(--info))' }} />
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">View Analytics</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Check your performance</div>
+              <div className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>View Analytics</div>
+              <div className="text-sm" style={{ color: 'hsl(var(--foreground-secondary))' }}>Check your performance</div>
             </div>
           </Button>
         </div>
@@ -159,22 +171,25 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Overview</h2>
+        <h2 className="text-headline mb-4" style={{ color: 'hsl(var(--foreground))' }}>Overview</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <Card key={index} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card key={index} className="card-modern transition-all duration-200 hover:card-elevated" style={{
+                backgroundColor: 'hsl(var(--surface))',
+                borderColor: 'hsl(var(--border))',
+              }}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <CardTitle className="text-sm font-medium" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                     {stat.title}
                   </CardTitle>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`h-4 w-4 ${stat.color}`} />
+                  <div className="p-2 rounded-lg transition-all duration-200" style={{ backgroundColor: `hsl(var(--brand-primary) / 0.1)` }}>
+                    <Icon className="h-4 w-4" style={{ color: 'hsl(var(--brand-primary))' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-2xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                     {loading ? '...' : stat.value.toLocaleString()}
                   </div>
                 </CardContent>
@@ -186,19 +201,22 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <Card className="card-modern" style={{
+          backgroundColor: 'hsl(var(--surface))',
+          borderColor: 'hsl(var(--border))',
+        }}>
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Recent Events</CardTitle>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
+            <CardTitle style={{ color: 'hsl(var(--foreground))' }}>Recent Events</CardTitle>
+            <CardDescription style={{ color: 'hsl(var(--foreground-secondary))' }}>
               Your latest streaming events
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {loading ? (
-                <p className="text-gray-500 dark:text-gray-400">Loading events...</p>
+                <p style={{ color: 'hsl(var(--foreground-secondary))' }}>Loading events...</p>
               ) : (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-8" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                   <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No recent events</p>
                   <Button 
@@ -214,19 +232,22 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <Card className="card-modern" style={{
+          backgroundColor: 'hsl(var(--surface))',
+          borderColor: 'hsl(var(--border))',
+        }}>
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Performance</CardTitle>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
+            <CardTitle style={{ color: 'hsl(var(--foreground))' }}>Performance</CardTitle>
+            <CardDescription style={{ color: 'hsl(var(--foreground-secondary))' }}>
               Last 7 days overview
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {loading ? (
-                <p className="text-gray-500 dark:text-gray-400">Loading performance data...</p>
+                <p style={{ color: 'hsl(var(--foreground-secondary))' }}>Loading performance data...</p>
               ) : (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-8" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                   <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No performance data yet</p>
                   <p className="text-sm mt-2">Start streaming to see your analytics</p>
