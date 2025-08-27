@@ -69,11 +69,11 @@ export default function LoginPage() {
       }}
     >
       {/* Theme Toggle - Top Right */}
-      <div className="absolute top-6 right-6">
+      <div className="absolute top-6 right-6 z-50">
         <ThemeToggle />
       </div>
       
-      <div className="w-full mx-auto px-4 sm:px-6 space-y-8 animate-fade-in" style={{ maxWidth: '32rem' }}>
+      <div className="w-full max-w-lg mx-auto px-4 sm:px-6 space-y-8 animate-fade-in">
         <div className="text-center">
           <h2 className="text-display" style={{ color: 'hsl(var(--foreground))' }}>
             Sign in to BigfootLive
@@ -83,10 +83,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <Card className="card-elevated mt-8 shadow-xl p-4 sm:p-6 lg:p-8 w-full mx-auto" style={{
+        <Card className="card-elevated mt-8 shadow-xl w-full max-w-md mx-auto" style={{
           backgroundColor: 'hsl(var(--surface))',
-          borderColor: 'hsl(var(--border))',
-          maxWidth: '28rem'
+          borderColor: 'hsl(var(--border))'
         }}>
           <CardHeader className="text-center">
             <CardTitle className="text-title" style={{ color: 'hsl(var(--foreground))' }}>Welcome Back</CardTitle>
@@ -94,7 +93,7 @@ export default function LoginPage() {
               Sign in to your BigfootLive account
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {isMainDomain && (
                 <Alert className="bg-blue-50 border-blue-200">
@@ -168,7 +167,7 @@ export default function LoginPage() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 rounded-full transition-all duration-200 hover:bg-[hsl(var(--surface-elevated))] active:scale-95"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 rounded-md transition-all duration-200 hover:bg-[hsl(var(--surface-elevated))]"
                     style={{ color: 'hsl(var(--foreground-tertiary))' }}
                     onClick={togglePasswordVisibility}
                     disabled={isLoading}

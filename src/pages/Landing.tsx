@@ -28,7 +28,7 @@ export default function LandingPage() {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-2">
               <Video className="h-8 w-8" style={{ color: 'hsl(var(--brand-primary))' }} />
@@ -56,7 +56,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="py-16 sm:py-24">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto animate-fade-in">
             <h2 className="text-display mb-6 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] bg-clip-text text-transparent">
               Professional Live Streaming Platform
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
       {/* Features Grid */}
       <section className="py-16">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h3 className="text-headline mb-4" style={{ color: 'hsl(var(--foreground))' }}>
               Everything You Need to Stream
@@ -165,7 +165,7 @@ export default function LandingPage() {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             {[
               { number: "10K+", label: "Active Streamers" },
@@ -189,7 +189,7 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-16">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card 
             className="card-elevated max-w-4xl mx-auto text-center p-8 lg:p-12"
             style={{
@@ -233,7 +233,7 @@ export default function LandingPage() {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Video className="h-6 w-6" style={{ color: 'hsl(var(--brand-primary))' }} />
