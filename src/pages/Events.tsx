@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -103,6 +103,8 @@ import {
   PercentCircle,
   Tag
 } from 'lucide-react';
+import api from '../services/api';
+import { useToast } from '@/components/ui/use-toast';
 
 // Enhanced Event interface with comprehensive branding and access controls
 export interface Event {
@@ -498,7 +500,10 @@ const mockEvents: Event[] = [
 ];
 
 export default function EventsPage() {
-  const [events] = useState<Event[]>(mockEvents);
+  const { toast } = useToast();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -550,6 +555,138 @@ export default function EventsPage() {
       reminderMinutes: [60, 15]
     }
   });
+
+  // Load events from API
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.getEvents();
+      setEvents(response || []);
+    } catch (err: any) {
+      console.error('Failed to fetch events:', err);
+      setError(err.message || 'Failed to load events');
+      // Fallback to mock data if API fails
+      setEvents(mockEvents);
+      toast({
+        title: 'Warning',
+        description: 'Could not connect to API. Using demo data.',
+        variant: 'default',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveEvent = async () => {
+    try {
+      if (dialogMode === 'create') {
+        const newEvent = await api.createEvent(eventForm);
+        setEvents([...events, newEvent]);
+      } else if (dialogMode === 'edit' && selectedEvent) {
+        const updatedEvent = await api.updateEvent(selectedEvent.id, eventForm);
+        setEvents(events.map(e => e.id === selectedEvent.id ? updatedEvent : e));
+      }
+      setShowEventDialog(false);
+      resetEventForm();
+      toast({
+        title: 'Success',
+        description: `Event ${dialogMode === 'create' ? 'created' : 'updated'} successfully.`,
+      });
+    } catch (err: any) {
+      console.error(`Failed to ${dialogMode} event:`, err);
+      toast({
+        title: 'Error',
+        description: err.message || `Failed to ${dialogMode} event.`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      await api.deleteEvent(eventId);
+      setEvents(events.filter(e => e.id !== eventId));
+      toast({
+        title: 'Success',
+        description: 'Event deleted successfully.',
+      });
+    } catch (err: any) {
+      console.error('Failed to delete event:', err);
+      toast({
+        title: 'Error',
+        description: err.message || 'Failed to delete event.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const resetEventForm = () => {
+    setEventForm({
+      name: '',
+      description: '',
+      category: '',
+      tags: [],
+      type: 'live-stream',
+      access: { 
+        privacy: 'public', 
+        registration: 'none',
+        restrictions: {},
+        ticketing: { type: 'free' },
+        features: {
+          waitingRoom: false,
+          lobby: false,
+          vipAccess: false,
+          breakoutRooms: false,
+          recordingAccess: 'all'
+        }
+      },
+      interactives: {
+        chat: true,
+        polls: false,
+        qa: false,
+        reactions: false,
+        toastMessages: false
+      },
+      recording: {
+        enabled: true,
+        autoArchive: false,
+        retentionDays: 90
+      },
+      notifications: {
+        email: true,
+        sms: false,
+        socialMedia: false,
+        reminderMinutes: [60, 15]
+      }
+    });
+    setSelectedEvent(null);
+  };
+
+  const openCreateDialog = () => {
+    resetEventForm();
+    setDialogMode('create');
+    setShowEventDialog(true);
+  };
+
+  const openEditDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setEventForm(event);
+    setDialogMode('edit');
+    setShowEventDialog(true);
+  };
+
+  const openViewDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setEventForm(event);
+    setDialogMode('view');
+    setShowEventDialog(true);
+  };
 
   // Status badge styling
   const getStatusBadge = useCallback((status: Event['status'], containerStatus?: Event['containerStatus']) => {
@@ -959,22 +1096,13 @@ export default function EventsPage() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => {
-                  setSelectedEvent(event);
-                  setDialogMode('view');
-                  setShowEventDialog(true);
-                }}
+                onClick={() => openViewDialog(event)}
               >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  setSelectedEvent(event);
-                  setDialogMode('edit');
-                  setEventForm(event);
-                  setShowEventDialog(true);
-                }}
+                onClick={() => openEditDialog(event)}
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Event
@@ -1032,7 +1160,10 @@ export default function EventsPage() {
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem 
+                className="text-red-600"
+                onClick={() => handleDeleteEvent(event.id)}
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Event
               </DropdownMenuItem>
@@ -1107,56 +1238,7 @@ export default function EventsPage() {
     };
   }, [events]);
 
-  // Event creation/editing handlers
-  const handleCreateEvent = () => {
-    setDialogMode('create');
-    setSelectedEvent(null);
-    setEventForm({
-      name: '',
-      description: '',
-      category: '',
-      tags: [],
-      type: 'live-stream',
-      access: { 
-        privacy: 'public', 
-        registration: 'none',
-        restrictions: {},
-        ticketing: { type: 'free' },
-        features: {
-          waitingRoom: false,
-          lobby: false,
-          vipAccess: false,
-          breakoutRooms: false,
-          recordingAccess: 'all'
-        }
-      },
-      interactives: {
-        chat: true,
-        polls: false,
-        qa: false,
-        reactions: false,
-        toastMessages: false
-      },
-      recording: {
-        enabled: true,
-        autoArchive: false,
-        retentionDays: 90
-      },
-      notifications: {
-        email: true,
-        sms: false,
-        socialMedia: false,
-        reminderMinutes: [60, 15]
-      }
-    });
-    setShowEventDialog(true);
-  };
-
-  const handleSaveEvent = () => {
-    // In real app, this would call API
-    console.log('Saving event:', eventForm);
-    setShowEventDialog(false);
-  };
+  // Event creation/editing handlers are now defined above with API integration
 
   // Bulk operations
   const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -1176,7 +1258,7 @@ export default function EventsPage() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button size="sm" onClick={handleCreateEvent}>
+          <Button size="sm" onClick={openCreateDialog}>
             <Plus className="h-4 w-4 mr-2" />
             Create Event
           </Button>

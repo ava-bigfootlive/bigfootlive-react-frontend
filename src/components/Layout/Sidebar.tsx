@@ -42,13 +42,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   ];
 
   return (
-    <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-200 ease-in-out ${
+    <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-card border-r border-border transition-transform duration-200 ease-in-out ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
     } lg:translate-x-0 lg:fixed`}>
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">BigfootLive</h2>
+        <div className="flex h-16 items-center justify-between px-6 border-b border-border">
+          <h2 className="text-xl font-bold text-foreground">BigfootLive</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -72,8 +72,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                   to={item.path}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
                     isActive
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -87,8 +87,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 to="/platform-admin"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
                   location.pathname === '/platform-admin'
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <Settings className="h-5 w-5" />
@@ -99,13 +99,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         </nav>
         
         {/* User section */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+        <div className="border-t border-border p-4">
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-foreground">
                 {user?.given_name || user?.email}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {user?.email}
               </p>
             </div>
@@ -113,7 +113,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               variant="ghost"
               size="icon"
               onClick={handleSignOut}
-              className="text-gray-500 dark:text-gray-400"
+              className="text-muted-foreground hover:text-foreground"
             >
               <LogOut className="h-5 w-5" />
             </Button>

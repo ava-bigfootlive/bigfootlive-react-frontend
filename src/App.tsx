@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/Layout/ProtectedRoute';
+import { Toaster } from './components/ui/toaster';
 import { useEffect } from 'react';
 
 // Pages
@@ -140,6 +141,7 @@ function App() {
           {/* 404 - Redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <Toaster />
       </AuthProvider>
     </Router>
   );

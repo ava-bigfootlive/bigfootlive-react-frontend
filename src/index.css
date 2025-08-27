@@ -1,48 +1,55 @@
-@import '@radix-ui/colors/plum.css';
-@import '@radix-ui/colors/plum-dark.css';
-@import '@radix-ui/colors/mauve.css';
-@import '@radix-ui/colors/mauve-dark.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import 'tailwindcss';
+/* Import BigFootLive Design System */
+@import './styles/design-system.css';
 
 @layer base {
   :root {
-    /* Background colors using mauve for neutral */
-    --background: 0 0% 100%;
-    --foreground: var(--mauve-12);
+    /* Light mode colors */
+    --background: 0 0% 100%; /* white */
+    --foreground: 240 10% 3.9%; /* near black */
     
     /* Card backgrounds */
-    --card: 0 0% 100%;
-    --card-foreground: var(--mauve-12);
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 240 10% 3.9%; /* near black */
     
     /* Popover/dropdown backgrounds */
-    --popover: 0 0% 100%;
-    --popover-foreground: var(--mauve-12);
+    --popover: 0 0% 100%; /* white */
+    --popover-foreground: 240 10% 3.9%; /* near black */
     
-    /* Primary using plum colors */
-    --primary: var(--plum-9);
-    --primary-foreground: white;
+    /* Primary - purple */
+    --primary: 280 65% 60%; /* purple */
+    --primary-foreground: 0 0% 100%; /* white */
     
-    /* Secondary using lighter plum */
-    --secondary: var(--plum-3);
-    --secondary-foreground: var(--plum-11);
+    /* Secondary - light purple */
+    --secondary: 280 40% 95%; /* very light purple */
+    --secondary-foreground: 280 65% 40%; /* dark purple */
     
     /* Muted backgrounds */
-    --muted: var(--mauve-3);
-    --muted-foreground: var(--mauve-11);
+    --muted: 240 4.8% 95.9%; /* very light gray */
+    --muted-foreground: 240 3.8% 46.1%; /* medium gray */
     
     /* Accent colors */
-    --accent: var(--plum-4);
-    --accent-foreground: var(--plum-11);
+    --accent: 280 40% 90%; /* light purple */
+    --accent-foreground: 280 65% 40%; /* dark purple */
     
     /* Destructive (errors) */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%; /* red */
+    --destructive-foreground: 0 0% 98%; /* white */
     
     /* Borders */
-    --border: var(--mauve-6);
-    --input: var(--mauve-7);
-    --ring: var(--plum-8);
+    --border: 240 5.9% 90%; /* light gray */
+    --input: 240 5.9% 90%; /* light gray */
+    --ring: 280 65% 60%; /* purple */
+    
+    /* Chart colors */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
     
     /* Other */
     --radius: 0.5rem;
@@ -50,68 +57,84 @@
 
   .dark {
     /* Dark mode background colors */
-    --background: var(--mauve-1);
-    --foreground: var(--mauve-12);
+    --background: 240 10% 3.9%; /* very dark gray */
+    --foreground: 0 0% 98%; /* almost white */
     
     /* Dark card backgrounds */
-    --card: var(--mauve-2);
-    --card-foreground: var(--mauve-12);
+    --card: 240 10% 7%; /* dark gray */
+    --card-foreground: 0 0% 98%; /* almost white */
     
     /* Dark popover backgrounds */
-    --popover: var(--mauve-2);
-    --popover-foreground: var(--mauve-12);
+    --popover: 240 10% 7%; /* dark gray */
+    --popover-foreground: 0 0% 98%; /* almost white */
     
-    /* Dark primary using plum */
-    --primary: var(--plum-9);
-    --primary-foreground: white;
+    /* Dark primary - purple */
+    --primary: 280 65% 60%; /* purple */
+    --primary-foreground: 0 0% 100%; /* white */
     
     /* Dark secondary */
-    --secondary: var(--plum-3);
-    --secondary-foreground: var(--plum-11);
+    --secondary: 240 10% 15%; /* dark gray */
+    --secondary-foreground: 0 0% 98%; /* almost white */
     
     /* Dark muted */
-    --muted: var(--mauve-3);
-    --muted-foreground: var(--mauve-11);
+    --muted: 240 10% 15%; /* dark gray */
+    --muted-foreground: 240 5% 64.9%; /* light gray */
     
     /* Dark accent */
-    --accent: var(--plum-4);
-    --accent-foreground: var(--plum-11);
+    --accent: 240 10% 15%; /* dark gray */
+    --accent-foreground: 0 0% 98%; /* almost white */
     
     /* Destructive remains same */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%; /* dark red */
+    --destructive-foreground: 0 0% 98%; /* white */
     
     /* Dark borders */
-    --border: var(--mauve-6);
-    --input: var(--mauve-7);
-    --ring: var(--plum-8);
+    --border: 240 10% 20%; /* dark gray border */
+    --input: 240 10% 20%; /* dark gray border */
+    --ring: 280 65% 60%; /* purple */
+    
+    /* Chart colors */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
 @layer base {
   * {
-    border-color: var(--border);
+    @apply border-border;
   }
   
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Ensure dark mode applies everywhere */
+  html {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 /* Custom BigfootLive styles */
 @layer components {
   .bigfoot-gradient {
-    background: linear-gradient(135deg, var(--plum-9) 0%, var(--plum-11) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
   }
   
   .bigfoot-text-gradient {
-    background: linear-gradient(135deg, var(--plum-9) 0%, var(--plum-11) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -119,7 +142,7 @@
   
   .ava-avatar {
     border-radius: 9999px;
-    background: linear-gradient(to bottom right, var(--plum-9), var(--plum-11));
+    background: linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary) / 0.8));
   }
   
   /* Custom scrollbar */

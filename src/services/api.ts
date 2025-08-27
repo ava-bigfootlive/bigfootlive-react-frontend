@@ -83,6 +83,77 @@ class ApiClient {
     });
   }
 
+  async updateTenant(id: string, data: any): Promise<any> {
+    return this.request(`/api/v1/tenants/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTenant(id: string): Promise<any> {
+    return this.request(`/api/v1/tenants/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // User management endpoints
+  async getUsers(): Promise<any> {
+    return this.request('/api/v1/users');
+  }
+
+  async getUser(id: string): Promise<any> {
+    return this.request(`/api/v1/users/${id}`);
+  }
+
+  async createUser(data: any): Promise<any> {
+    return this.request('/api/v1/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateUser(id: string, data: any): Promise<any> {
+    return this.request(`/api/v1/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteUser(id: string): Promise<any> {
+    return this.request(`/api/v1/users/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Feature flags endpoints
+  async getFeatureFlags(): Promise<any> {
+    return this.request('/api/v1/feature-flags');
+  }
+
+  async getFeatureFlag(id: string): Promise<any> {
+    return this.request(`/api/v1/feature-flags/${id}`);
+  }
+
+  async createFeatureFlag(data: any): Promise<any> {
+    return this.request('/api/v1/feature-flags', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateFeatureFlag(id: string, data: any): Promise<any> {
+    return this.request(`/api/v1/feature-flags/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteFeatureFlag(id: string): Promise<any> {
+    return this.request(`/api/v1/feature-flags/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Event endpoints
   async getEvents(): Promise<any> {
     return this.request('/api/v1/events');

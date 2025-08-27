@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import FeatureFlags from './PlatformAdmin/FeatureFlags';
+import TenantManagement from './PlatformAdmin/TenantManagement';
+import UserManagement from './PlatformAdmin/UserManagement';
 
 interface PlatformStats {
   totalTenants: number;
@@ -108,14 +110,14 @@ export default function PlatformAdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
+      <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-2xl font-bold text-white">Platform Administration</h1>
-              <p className="text-gray-400 text-sm mt-1">
+              <h1 className="text-2xl font-bold text-foreground">Platform Administration</h1>
+              <p className="text-muted-foreground text-sm mt-1">
                 Manage and monitor the entire BigfootLive platform
               </p>
             </div>
@@ -123,7 +125,6 @@ export default function PlatformAdminPage() {
               <Button
                 variant="outline"
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-300 border-gray-600"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
@@ -134,7 +135,7 @@ export default function PlatformAdminPage() {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-gray-800 border-b border-gray-700">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
             {navigationItems.map((item) => {
@@ -146,8 +147,8 @@ export default function PlatformAdminPage() {
                   className={`
                     flex items-center py-4 px-1 border-b-2 text-sm font-medium transition-colors
                     ${activeTab === item.id
-                      ? 'border-blue-500 text-blue-500'
-                      : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'
                     }
                   `}
                 >
@@ -175,9 +176,9 @@ export default function PlatformAdminPage() {
               {statsCards.map((stat, index) => {
                 const Icon = stat.icon;
                 return (
-                  <Card key={index} className="bg-gray-800 border-gray-700">
+                  <Card key={index} className="bg-card border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-300">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">
                         {stat.title}
                       </CardTitle>
                       <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -185,7 +186,7 @@ export default function PlatformAdminPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-white">
+                      <div className="text-2xl font-bold text-foreground">
                         {loading ? '...' : stat.value}
                       </div>
                       <p className="text-xs text-green-500 mt-1">
@@ -198,17 +199,17 @@ export default function PlatformAdminPage() {
             </div>
 
             {/* System Health */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">System Health</CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardTitle className="text-foreground">System Health</CardTitle>
+                <CardDescription className="text-muted-foreground">
                   Overall platform performance and status
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-400">Status</span>
+                    <span className="text-muted-foreground">Status</span>
                     <span className={`flex items-center ${
                       stats.systemHealth === 'healthy' ? 'text-green-500' :
                       stats.systemHealth === 'warning' ? 'text-yellow-500' :
@@ -220,14 +221,14 @@ export default function PlatformAdminPage() {
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-400">Storage Usage</span>
-                      <span className="text-white">
+                      <span className="text-muted-foreground">Storage Usage</span>
+                      <span className="text-foreground">
                         {stats.storageUsed}GB / {stats.storageTotal}GB
                       </span>
                     </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full"
+                        className="bg-primary h-2 rounded-full"
                         style={{ width: `${(stats.storageUsed / stats.storageTotal) * 100}%` }}
                       />
                     </div>
@@ -238,38 +239,38 @@ export default function PlatformAdminPage() {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-gray-800 border-gray-700 cursor-pointer hover:border-gray-600">
+              <Card className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors">
                 <CardContent className="p-6 flex items-center space-x-4">
                   <div className="p-3 bg-blue-500/20 rounded-lg">
                     <Shield className="h-6 w-6 text-blue-500" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Security Settings</p>
-                    <p className="text-sm text-gray-400">Manage platform security</p>
+                    <p className="text-foreground font-medium">Security Settings</p>
+                    <p className="text-sm text-muted-foreground">Manage platform security</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border-gray-700 cursor-pointer hover:border-gray-600">
+              <Card className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors">
                 <CardContent className="p-6 flex items-center space-x-4">
                   <div className="p-3 bg-green-500/20 rounded-lg">
                     <Database className="h-6 w-6 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Database</p>
-                    <p className="text-sm text-gray-400">Monitor database performance</p>
+                    <p className="text-foreground font-medium">Database</p>
+                    <p className="text-sm text-muted-foreground">Monitor database performance</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border-gray-700 cursor-pointer hover:border-gray-600">
+              <Card className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors">
                 <CardContent className="p-6 flex items-center space-x-4">
                   <div className="p-3 bg-purple-500/20 rounded-lg">
                     <Bell className="h-6 w-6 text-purple-500" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Notifications</p>
-                    <p className="text-sm text-gray-400">Configure alerts</p>
+                    <p className="text-foreground font-medium">Notifications</p>
+                    <p className="text-sm text-muted-foreground">Configure alerts</p>
                   </div>
                 </CardContent>
               </Card>
@@ -278,40 +279,10 @@ export default function PlatformAdminPage() {
         )}
 
         {/* Tenants Tab */}
-        {activeTab === 'tenants' && (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Tenant Management</CardTitle>
-              <CardDescription className="text-gray-400">
-                View and manage all platform tenants
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-400">
-                <Building2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Tenant management interface coming soon</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {activeTab === 'tenants' && <TenantManagement />}
 
         {/* Users Tab */}
-        {activeTab === 'users' && (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">User Management</CardTitle>
-              <CardDescription className="text-gray-400">
-                Manage platform users and permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-400">
-                <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>User management interface coming soon</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {activeTab === 'users' && <UserManagement />}
 
         {/* Feature Flags Tab */}
         {activeTab === 'features' && (
@@ -320,15 +291,15 @@ export default function PlatformAdminPage() {
 
         {/* Billing Tab */}
         {activeTab === 'billing' && (
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">Billing & Revenue</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle className="text-foreground">Billing & Revenue</CardTitle>
+              <CardDescription className="text-muted-foreground">
                 Platform billing and financial overview
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <DollarSign className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>Billing management interface coming soon</p>
               </div>
@@ -338,15 +309,15 @@ export default function PlatformAdminPage() {
 
         {/* System Tab */}
         {activeTab === 'system' && (
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">System Configuration</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle className="text-foreground">System Configuration</CardTitle>
+              <CardDescription className="text-muted-foreground">
                 Platform settings and configuration
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <Server className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>System configuration interface coming soon</p>
               </div>
