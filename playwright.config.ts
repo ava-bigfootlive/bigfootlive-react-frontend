@@ -8,6 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  testMatch: ['**/*.spec.ts'],
   
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -35,7 +36,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://bigfootlive.io',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://d2dbuyze4zqbdy.cloudfront.net',
     
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -82,14 +83,43 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // Desktop browsers
+    // Production regression tests
     {
-      name: 'chromium',
+      name: 'production-regression',
       use: { 
         ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+        permissions: ['clipboard-read', 'clipboard-write'],
       },
+      testMatch: '**/production-regression.spec.ts',
     },
-
+    // VOD upload tests
+    {
+      name: 'vod-upload',
+      use: { 
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+      },
+      testMatch: '**/vod-upload.spec.ts',
+    },
+    // Live streaming tests
+    {
+      name: 'live-streaming',
+      use: { 
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
+      testMatch: '**/live-streaming.spec.ts',
+    },
+    // Mobile tests
+    {
+      name: 'mobile',
+      use: {
+        ...devices['iPhone 12'],
+      },
+      testMatch: '**/production-regression.spec.ts',
+    },
   ],
 
   /* Folder for test artifacts */
