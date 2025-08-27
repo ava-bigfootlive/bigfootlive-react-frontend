@@ -19,6 +19,7 @@ import AnalyticsPage from './pages/Analytics';
 import ChatPage from './pages/Chat';
 import DocumentationPage from './pages/Documentation';
 import EventsPage from './pages/Events';
+import LandingPage from './pages/Landing';
 
 function App() {
   // Initialize theme on app load
@@ -38,6 +39,7 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -135,11 +137,8 @@ function App() {
             }
           />
           
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          
-          {/* 404 - Redirect to dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* 404 - Redirect to landing */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Toaster />
       </AuthProvider>

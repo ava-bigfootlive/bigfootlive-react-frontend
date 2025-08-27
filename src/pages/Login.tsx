@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -59,21 +61,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div 
+      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
+      style={{
+        background: 'hsl(var(--background))',
+        backgroundImage: 'hsl(var(--brand-gradient))'
+      }}
+    >
+      {/* Theme Toggle - Top Right */}
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+      
+      <div className="max-w-md w-full space-y-8 animate-fade-in">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="text-display" style={{ color: 'hsl(var(--foreground))' }}>
             Sign in to BigfootLive
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="text-subtitle mt-3">
             Enter your credentials to access your account
           </p>
         </div>
 
-        <Card className="mt-8 bg-white border-gray-200 shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-gray-900">Welcome Back</CardTitle>
-            <CardDescription className="text-gray-600">
+        <Card className="card-modern mt-8" style={{
+          backgroundColor: 'hsl(var(--surface))',
+          borderColor: 'hsl(var(--border))'
+        }}>
+          <CardHeader className="text-center">
+            <CardTitle className="text-title" style={{ color: 'hsl(var(--foreground))' }}>Welcome Back</CardTitle>
+            <CardDescription className="text-subtitle">
               Sign in to your BigfootLive account
             </CardDescription>
           </CardHeader>
@@ -94,8 +110,8 @@ export default function LoginPage() {
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <div className="space-y-3">
+                <label htmlFor="email" className="text-overline" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                   Email Address
                 </label>
                 <Input
@@ -109,12 +125,20 @@ export default function LoginPage() {
                   placeholder="Enter your email"
                   disabled={isLoading}
                   data-testid="email-input"
-                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                  className={cn(
+                    "input-modern transition-all duration-200",
+                    "focus:shadow-lg hover:shadow-md"
+                  )}
+                  style={{
+                    backgroundColor: 'hsl(var(--input-background))',
+                    borderColor: 'hsl(var(--input-border))',
+                    color: 'hsl(var(--foreground))'
+                  }}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <div className="space-y-3">
+                <label htmlFor="password" className="text-overline" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                   Password
                 </label>
                 <div className="relative">
@@ -129,13 +153,22 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     disabled={isLoading}
                     data-testid="password-input"
-                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                    className={cn(
+                      "input-modern pr-10 transition-all duration-200",
+                      "focus:shadow-lg hover:shadow-md"
+                    )}
+                    style={{
+                      backgroundColor: 'hsl(var(--input-background))',
+                      borderColor: 'hsl(var(--input-border))',
+                      color: 'hsl(var(--foreground))'
+                    }}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500"
+                    className="absolute right-0 top-0 h-full px-3 py-2 rounded-full transition-all duration-200 hover:bg-[hsl(var(--surface-elevated))] active:scale-95"
+                    style={{ color: 'hsl(var(--foreground-tertiary))' }}
                     onClick={togglePasswordVisibility}
                     disabled={isLoading}
                   >
@@ -152,7 +185,8 @@ export default function LoginPage() {
                 <div className="text-sm">
                   <Link
                     to="/forgot-password"
-                    className="font-medium text-purple-600 hover:text-purple-500"
+                    className="text-caption font-medium transition-colors duration-200 hover:underline"
+                    style={{ color: 'hsl(var(--brand-primary))' }}
                     data-testid="forgot-password-link"
                   >
                     Forgot your password?
@@ -162,7 +196,14 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                className={cn(
+                  "btn-primary w-full shadow-lg hover:shadow-xl transition-all duration-200",
+                  "active:scale-95 font-medium"
+                )}
+                style={{
+                  background: 'hsl(var(--button-primary))',
+                  color: 'white'
+                }}
                 disabled={isLoading || !formData.email || !formData.password}
                 data-testid="login-button"
               >
@@ -178,11 +219,12 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <span className="text-sm text-gray-600">
+              <span className="text-caption" style={{ color: 'hsl(var(--foreground-secondary))' }}>
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-medium text-purple-600 hover:text-purple-500"
+                  className="font-medium transition-colors duration-200 hover:underline"
+                  style={{ color: 'hsl(var(--brand-primary))' }}
                   data-testid="signup-link"
                 >
                   Sign up
