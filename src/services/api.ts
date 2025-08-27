@@ -539,6 +539,38 @@ class ApiClient {
     });
   }
 
+  // Media/VOD endpoints
+  async getUploadUrl(filename: string, contentType: string = 'video/mp4'): Promise<any> {
+    return this.request('/api/v1/media/upload/presigned-url', {
+      method: 'POST',
+      body: JSON.stringify({ filename, content_type: contentType }),
+    });
+  }
+
+  async completeUpload(objectKey: string, title?: string, description?: string, streamId?: string): Promise<any> {
+    return this.request('/api/v1/media/upload/complete', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        object_key: objectKey, 
+        title,
+        description,
+        stream_id: streamId
+      }),
+    });
+  }
+
+  async getProcessingStatus(jobId: string): Promise<any> {
+    return this.request(`/api/v1/media/processing/status/${jobId}`);
+  }
+
+  async getUserMedia(skip: number = 0, limit: number = 20): Promise<any> {
+    return this.request(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`);
+  }
+
+  async getMedia(mediaId: string): Promise<any> {
+    return this.request(`/api/v1/media/media/${mediaId}`);
+  }
+
   // Stream endpoints
   async getStreams(): Promise<any> {
     return this.request('/api/v1/streams');
