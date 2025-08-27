@@ -65,6 +65,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (currentUser && session.tokens) {
         const userAttributes = session.tokens.idToken?.payload;
         const userGroups = userAttributes?.['cognito:groups'] as string[] || [];
+        const userTenantId = userAttributes?.['custom:tenant_id'] as string;
+        
+        // Get current domain and tenant
+        const hostname = window.location.hostname;
+        const isPlatformAdmin = userGroups.includes('platform_admin');
+        
+        // Extract tenant from subdomain (e.g., acme.bigfootlive.io -> acme)
+        const tenantFromDomain = hostname.split('.')[0];
+        const isMainDomain = hostname === 'bigfootlive.io' || 
+                            hostname === 'www.bigfootlive.io';
+        const isCloudFront = hostname === 'd2dbuyze4zqbdy.cloudfront.net';
+        const isLocalhost = hostname === 'localhost';
+        
+        // If user is on main domain and has a tenant (not platform admin), redirect to their tenant
+        if (isMainDomain && userTenantId && !isPlatformAdmin) {
+          // Set user first so they're authenticated when redirected
+          setUser({
+            id: currentUser.userId,
+            email: userAttributes?.email as string || '',
+            given_name: userAttributes?.given_name as string,
+            family_name: userAttributes?.family_name as string,
+            firstName: userAttributes?.given_name as string,
+            lastName: userAttributes?.family_name as string,
+            username: currentUser.username,
+            tenantId: userTenantId,
+            roles: (userAttributes?.['custom:roles'] as string)?.split(',') || [],
+            role: 'user'
+          });
+          
+          // Redirect to tenant subdomain - auth cookies should work across subdomains
+          setTimeout(() => {
+            const tenantUrl = `https://${userTenantId}.bigfootlive.io${window.location.pathname}`;
+            window.location.replace(tenantUrl);
+          }, 100);
+          return;
+        }
+        
+        // Validate tenant access for subdomain access
+        if (!isMainDomain && !isCloudFront && !isLocalhost && !isPlatformAdmin) {
+          // User is on a tenant subdomain - validate they belong to this tenant
+          if (!userTenantId || userTenantId !== tenantFromDomain) {
+            console.error(`Tenant mismatch: User tenant ${userTenantId} trying to access ${tenantFromDomain}`);
+            await amplifySignOut();
+            setUser(null);
+            setError('You do not have access to this tenant');
+            return;
+          }
+        }
+        
         setUser({
           id: currentUser.userId,
           email: userAttributes?.email as string || '',
@@ -73,9 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           firstName: userAttributes?.given_name as string,
           lastName: userAttributes?.family_name as string,
           username: currentUser.username,
-          tenantId: userAttributes?.['custom:tenant_id'] as string,
+          tenantId: userTenantId,
           roles: (userAttributes?.['custom:roles'] as string)?.split(',') || [],
-          role: userGroups.includes('platform_admin') ? 'platform_admin' : 'user'
+          role: isPlatformAdmin ? 'platform_admin' : 'user'
         });
       }
     } catch (err) {
@@ -98,7 +147,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (isSignedIn) {
+        // Check tenant validation after sign in
+        const session = await fetchAuthSession();
+        const userAttributes = session.tokens?.idToken?.payload;
+        const userTenantId = userAttributes?.['custom:tenant_id'] as string;
+        const userGroups = userAttributes?.['cognito:groups'] as string[] || [];
+        const isPlatformAdmin = userGroups.includes('platform_admin');
+        
+        // Get current domain and validate
+        const hostname = window.location.hostname;
+        const tenantFromDomain = hostname.split('.')[0];
+        const isMainDomain = hostname === 'bigfootlive.io' || 
+                            hostname === 'www.bigfootlive.io';
+        const isCloudFront = hostname === 'd2dbuyze4zqbdy.cloudfront.net';
+        const isLocalhost = hostname === 'localhost';
+        
+        // If user is on main domain and has a tenant, redirect to their tenant subdomain
+        if (isMainDomain && userTenantId && !isPlatformAdmin) {
+          // Don't call checkAuth here, just redirect
+          // The cookies will be available on the subdomain
+          const tenantUrl = `https://${userTenantId}.bigfootlive.io/dashboard`;
+          window.location.replace(tenantUrl);
+          return; // Don't navigate locally
+        }
+        
+        // If on a tenant subdomain, validate they belong to that tenant
+        if (!isMainDomain && !isCloudFront && !isLocalhost && !isPlatformAdmin) {
+          if (!userTenantId || userTenantId !== tenantFromDomain) {
+            await amplifySignOut();
+            throw new Error(`Access denied. This account belongs to a different tenant.`);
+          }
+        }
+        
+        // Platform admins and localhost/CloudFront can proceed normally
+        // If validation passes, complete the auth check
         await checkAuth();
+        
+        // Navigate to dashboard after successful auth
         navigate('/dashboard');
       } else if (nextStep.signInStep === 'CONFIRM_SIGN_UP') {
         throw new Error('Please confirm your account before signing in');

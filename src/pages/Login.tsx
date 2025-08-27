@@ -17,6 +17,10 @@ export default function LoginPage() {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Check if on main domain
+  const hostname = window.location.hostname;
+  const isMainDomain = hostname === 'bigfootlive.io' || hostname === 'www.bigfootlive.io';
 
   // Get the redirect path from location state or default to dashboard
   const from = (location.state as any)?.from?.pathname || '/dashboard';
@@ -55,26 +59,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-white">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Sign in to BigfootLive
           </h2>
-          <p className="mt-2 text-sm text-gray-300">
+          <p className="mt-2 text-sm text-gray-600">
             Enter your credentials to access your account
           </p>
         </div>
 
-        <Card className="mt-8 bg-slate-800/50 border-slate-700">
+        <Card className="mt-8 bg-white border-gray-200 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-white">Welcome Back</CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardTitle className="text-gray-900">Welcome Back</CardTitle>
+            <CardDescription className="text-gray-600">
               Sign in to your BigfootLive account
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {isMainDomain && (
+                <Alert className="bg-blue-50 border-blue-200">
+                  <AlertDescription className="text-blue-800">
+                    You will be redirected to your tenant's domain after login.
+                    Platform admins can access any domain.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               {error && (
                 <Alert variant="destructive" data-testid="error-message">
                   <AlertDescription>{error}</AlertDescription>
@@ -82,7 +95,7 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email Address
                 </label>
                 <Input
@@ -96,12 +109,12 @@ export default function LoginPage() {
                   placeholder="Enter your email"
                   disabled={isLoading}
                   data-testid="email-input"
-                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
                 />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
                 <div className="relative">
@@ -116,13 +129,13 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     disabled={isLoading}
                     data-testid="password-input"
-                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500"
                     onClick={togglePasswordVisibility}
                     disabled={isLoading}
                   >
@@ -139,7 +152,7 @@ export default function LoginPage() {
                 <div className="text-sm">
                   <Link
                     to="/forgot-password"
-                    className="font-medium text-blue-400 hover:text-blue-300"
+                    className="font-medium text-purple-600 hover:text-purple-500"
                     data-testid="forgot-password-link"
                   >
                     Forgot your password?
@@ -149,7 +162,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                 disabled={isLoading || !formData.email || !formData.password}
                 data-testid="login-button"
               >
@@ -165,11 +178,11 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <span className="text-sm text-gray-300">
+              <span className="text-sm text-gray-600">
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-medium text-blue-400 hover:text-blue-300"
+                  className="font-medium text-purple-600 hover:text-purple-500"
                   data-testid="signup-link"
                 >
                   Sign up
