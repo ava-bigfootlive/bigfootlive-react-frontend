@@ -274,82 +274,102 @@ export default function UserManagement() {
 
           {/* Users Table */}
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading users...
+            <div className="text-center py-12 animate-fade-in">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-lg" style={{ backgroundColor: 'hsl(var(--surface-elevated))' }}>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent" style={{ borderColor: 'hsl(var(--brand-primary))' }}></div>
+                <span className="text-body" style={{ color: 'hsl(var(--foreground-secondary))' }}>Loading users...</span>
+              </div>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No users found</p>
+            <div className="text-center py-12 animate-fade-in">
+              <div className="card-elevated p-8 max-w-sm mx-auto">
+                <Users className="h-16 w-16 mx-auto mb-4 opacity-50" style={{ color: 'hsl(var(--foreground-tertiary))' }} />
+                <p className="text-body" style={{ color: 'hsl(var(--foreground-secondary))' }}>No users found</p>
+                <p className="text-caption mt-2" style={{ color: 'hsl(var(--foreground-tertiary))' }}>Try adjusting your search terms</p>
+              </div>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Tenant</TableHead>
-                  <TableHead>Last Login</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">
-                      {user.given_name && user.family_name
-                        ? `${user.given_name} ${user.family_name}`
-                        : user.given_name || '-'}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{getRoleBadge(user.role)}</TableCell>
-                    <TableCell>{getStatusBadge(user.status)}</TableCell>
-                    <TableCell>{user.tenant_name || '-'}</TableCell>
-                    <TableCell>
-                      {user.last_login
-                        ? new Date(user.last_login).toLocaleDateString()
-                        : 'Never'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditDialog(user)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSuspendUser(user)}>
-                            {user.status === 'suspended' ? (
-                              <>
-                                <Shield className="h-4 w-4 mr-2" />
-                                Activate
-                              </>
-                            ) : (
-                              <>
-                                <Ban className="h-4 w-4 mr-2" />
-                                Suspend
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openDeleteDialog(user)}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            <div className="card-elevated rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ backgroundColor: 'hsl(var(--surface-elevated))', borderColor: 'hsl(var(--border))' }}>
+                    <TableHead className="text-overline font-semibold px-6 py-4" style={{ color: 'hsl(var(--foreground-secondary))' }}>Name</TableHead>
+                    <TableHead className="text-overline font-semibold" style={{ color: 'hsl(var(--foreground-secondary))' }}>Email</TableHead>
+                    <TableHead className="text-overline font-semibold" style={{ color: 'hsl(var(--foreground-secondary))' }}>Role</TableHead>
+                    <TableHead className="text-overline font-semibold" style={{ color: 'hsl(var(--foreground-secondary))' }}>Status</TableHead>
+                    <TableHead className="text-overline font-semibold" style={{ color: 'hsl(var(--foreground-secondary))' }}>Tenant</TableHead>
+                    <TableHead className="text-overline font-semibold" style={{ color: 'hsl(var(--foreground-secondary))' }}>Last Login</TableHead>
+                    <TableHead className="text-overline font-semibold text-right px-6" style={{ color: 'hsl(var(--foreground-secondary))' }}>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user, index) => (
+                    <TableRow 
+                      key={user.id} 
+                      className="animate-fade-in transition-colors duration-200 hover:bg-[hsl(var(--surface-overlay))]" 
+                      style={{ 
+                        borderColor: 'hsl(var(--border))',
+                        animationDelay: `${index * 50}ms`
+                      }}
+                    >
+                      <TableCell className="font-medium px-6 py-4" style={{ color: 'hsl(var(--foreground))' }}>
+                        {user.given_name && user.family_name
+                          ? `${user.given_name} ${user.family_name}`
+                          : user.given_name || '-'}
+                      </TableCell>
+                      <TableCell className="text-caption" style={{ color: 'hsl(var(--foreground-secondary))' }}>{user.email}</TableCell>
+                      <TableCell>{getRoleBadge(user.role)}</TableCell>
+                      <TableCell>{getStatusBadge(user.status)}</TableCell>
+                      <TableCell className="text-caption" style={{ color: 'hsl(var(--foreground-secondary))' }}>{user.tenant_name || '-'}</TableCell>
+                      <TableCell className="text-caption" style={{ color: 'hsl(var(--foreground-secondary))' }}>
+                        {user.last_login
+                          ? new Date(user.last_login).toLocaleDateString()
+                          : 'Never'}
+                      </TableCell>
+                      <TableCell className="text-right px-6">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8 rounded-full transition-all duration-200 hover:bg-[hsl(var(--surface-elevated))] hover:shadow-md"
+                              style={{ color: 'hsl(var(--foreground-tertiary))' }}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditDialog(user)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleSuspendUser(user)}>
+                              {user.status === 'suspended' ? (
+                                <>
+                                  <Shield className="h-4 w-4 mr-2" />
+                                  Activate
+                                </>
+                              ) : (
+                                <>
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Suspend
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => openDeleteDialog(user)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>

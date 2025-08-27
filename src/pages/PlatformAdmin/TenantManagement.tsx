@@ -340,6 +340,7 @@ export default function TenantManagement() {
                   </TableRow>
                 ))}
               </TableBody>
+            </Table>
             </div>
           )}
         </CardContent>
