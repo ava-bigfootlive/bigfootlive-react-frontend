@@ -73,8 +73,7 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
       
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto px-4 sm:px-6">
-        <div className="max-w-md mx-auto space-y-8 animate-fade-in">
+      <div className="w-full max-w-lg mx-auto px-4 sm:px-6 space-y-8 animate-fade-in">
         <div className="text-center">
           <h2 className="text-display" style={{ color: 'hsl(var(--foreground))' }}>
             Sign in to BigfootLive
@@ -84,7 +83,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <Card className="card-elevated mt-8 shadow-xl p-2 sm:p-4 lg:p-6" style={{
+        <Card className="card-elevated mt-8 shadow-xl p-4 sm:p-6 lg:p-8 w-full max-w-md mx-auto" style={{
           backgroundColor: 'hsl(var(--surface))',
           borderColor: 'hsl(var(--border))'
         }}>
@@ -234,7 +233,6 @@ export default function LoginPage() {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );
