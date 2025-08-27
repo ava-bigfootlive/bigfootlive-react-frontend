@@ -55,7 +55,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 10000
       }
     ],
     "shard": null,
@@ -78,8 +78,8 @@
     }
   ],
   "stats": {
-    "startTime": "2025-08-27T08:06:29.456Z",
-    "duration": 120019.238,
+    "startTime": "2025-08-27T08:35:20.508Z",
+    "duration": 120018.122,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,

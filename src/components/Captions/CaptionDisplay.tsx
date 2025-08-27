@@ -117,16 +117,22 @@ const CaptionDisplay: React.FC<CaptionDisplayProps> = ({
   const dragRef = useRef({ startX: 0, startY: 0, startTime: 0 });
 
   // WebSocket for live captions
-  const { isConnected, messages } = useWebSocket(
-    `ws://localhost:8000/captions/sessions/${sessionId}/live`,
-    {
-      onMessage: (message) => {
-        if (message.type === 'captions') {
-          setCaptions(prev => [...prev.slice(-100), ...message.captions]); // Keep last 100 captions
-        }
+  // Use WebSocket only when needed for captions, silent mode
+  const { isConnected, messages, subscribe } = useWebSocket({ autoConnect: false, silent: true });
+  
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const unsubscribe = subscribe('captions', (message: any) => {
+      if (message.type === 'captions') {
+        setCaptions(prev => [...prev.slice(-100), ...message.captions]); // Keep last 100 captions
       }
-    }
-  );
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, [sessionId, subscribe]);
 
   // Current visible captions based on time
   const visibleCaptions = useMemo(() => {

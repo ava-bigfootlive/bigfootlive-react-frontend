@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/services/api';
+import api from '@/services/api';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { clearFeatureFlagCache } from '@/hooks/useFeatureFlag';
 
@@ -21,7 +21,8 @@ const FeatureFlagContext = createContext<FeatureFlagContextValue | undefined>(un
  */
 export function FeatureFlagProvider({ children }: { children: React.ReactNode }) {
   const { user, tenant } = useAuth();
-  const { subscribe, unsubscribe } = useWebSocket();
+  // Use WebSocket in silent mode, no auto-connect for feature flags
+  const { subscribe, unsubscribe } = useWebSocket({ autoConnect: false, silent: true });
   const [flags, setFlags] = useState<Map<string, any>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>();
@@ -40,8 +41,8 @@ export function FeatureFlagProvider({ children }: { children: React.ReactNode })
       const response = await api.post('/api/feature-flags/evaluate/all', {
         context: {
           userId: user.id,
-          tenantId: tenant?.id,
-          tenantTier: tenant?.subscription_tier,
+          tenantId: tenant,
+          tenantTier: user?.tenantId ? 'basic' : undefined, // TODO: Get actual tier from API
         },
       });
 
@@ -79,14 +80,14 @@ export function FeatureFlagProvider({ children }: { children: React.ReactNode })
       fetchFlags();
     };
 
-    subscribe('feature_flag_update', handleFlagUpdate);
-    subscribe('feature_flag_override', handleFlagUpdate);
-    subscribe('experiment_status_change', handleFlagUpdate);
+    const unsubscribe1 = subscribe('feature_flag_update', handleFlagUpdate);
+    const unsubscribe2 = subscribe('feature_flag_override', handleFlagUpdate);
+    const unsubscribe3 = subscribe('experiment_status_change', handleFlagUpdate);
 
     return () => {
-      unsubscribe('feature_flag_update');
-      unsubscribe('feature_flag_override');
-      unsubscribe('experiment_status_change');
+      unsubscribe1();
+      unsubscribe2();
+      unsubscribe3();
     };
   }, [user, subscribe, unsubscribe, fetchFlags]);
 

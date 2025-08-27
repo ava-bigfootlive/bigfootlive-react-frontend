@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   MessageSquare, 
   Settings, 
@@ -28,191 +29,36 @@ import {
   VolumeX,
   Activity,
   CheckCircle,
-  Globe
+  Globe,
+  Send,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
-import { useWebSocket } from '../hooks/useWebSocket';
-import type { ChatMessage, EventChatSummary, ModerationAlert, AlertSeverity, UserRole, SentimentScore, ModerationAction } from '../types/chat';
+import wsService from '../services/websocket';
+import { apiClient } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import type { ChatMessage, EventChatSummary, ModerationAlert, AlertSeverity, UserRole, SentimentScore, ModerationAction, MessageType } from '../types/chat';
 
-// Mock data for demonstration
-const mockActiveEvents: EventChatSummary[] = [
-  {
-    eventId: '1',
-    eventTitle: 'BigFoot Gaming Championship',
-    status: 'active',
-    participantCount: 1247,
-    messageCount: 15847,
-    messagesPerMinute: 23,
-    moderatorCount: 3,
-    pendingActions: 7,
-    alertCount: { critical: 1, high: 3, medium: 8, low: 15 },
-    lastActivity: Date.now() - 5000,
-    chatEnabled: true,
-    slowMode: false,
-    slowModeDelay: 0,
-    subscriberOnly: false,
-    moderatedMode: false,
-    emotesOnly: false,
-    linksDisabled: false
-  },
-  {
-    eventId: '2',
-    eventTitle: 'Tech Talk: AI in Streaming',
-    status: 'active',
-    participantCount: 432,
-    messageCount: 3241,
-    messagesPerMinute: 8,
-    moderatorCount: 2,
-    pendingActions: 2,
-    alertCount: { critical: 0, high: 1, medium: 3, low: 5 },
-    lastActivity: Date.now() - 12000,
-    chatEnabled: true,
-    slowMode: true,
-    slowModeDelay: 30,
-    subscriberOnly: false,
-    moderatedMode: false,
-    emotesOnly: false,
-    linksDisabled: true
-  },
-  {
-    eventId: '3',
-    eventTitle: 'Music Festival Live',
-    status: 'active',
-    participantCount: 2891,
-    messageCount: 47392,
-    messagesPerMinute: 67,
-    moderatorCount: 5,
-    pendingActions: 23,
-    alertCount: { critical: 2, high: 12, medium: 31, low: 87 },
-    lastActivity: Date.now() - 1000,
-    chatEnabled: true,
-    slowMode: false,
-    slowModeDelay: 0,
-    subscriberOnly: false,
-    moderatedMode: true,
-    emotesOnly: false,
-    linksDisabled: false
-  }
-];
-
-const mockMessages: ChatMessage[] = [
-  {
-    id: '1',
-    eventId: '1',
-    userId: 'user1',
-    username: 'GamerPro2024',
-    userRole: 'subscriber',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GamerPro2024',
-    type: 'text',
-    content: 'This gameplay is absolutely insane! 🔥',
-    timestamp: Date.now() - 30000,
-    edited: false,
-    deleted: false,
-    pinned: false,
-    reportCount: 0,
-    moderationFlags: [],
-    sentimentScore: 'positive',
-    toxicityLevel: 5,
-    isSpam: false,
-    reactions: { '🔥': 12, '👍': 8 }
-  },
-  {
-    id: '2',
-    eventId: '1',
-    userId: 'user2',
-    username: 'ToxicTroll99',
-    userRole: 'viewer',
-    type: 'text',
-    content: 'This is boring, streamer is trash and should quit',
-    timestamp: Date.now() - 25000,
-    edited: false,
-    deleted: false,
-    pinned: false,
-    reportCount: 3,
-    moderationFlags: ['harassment', 'toxic'],
-    sentimentScore: 'toxic',
-    toxicityLevel: 89,
-    isSpam: false,
-    reactions: {}
-  },
-  {
-    id: '3',
-    eventId: '1',
-    userId: 'user3',
-    username: 'ChatModerator',
-    userRole: 'moderator',
-    type: 'text',
-    content: 'Please keep the chat respectful everyone! Remember our community guidelines.',
-    timestamp: Date.now() - 20000,
-    edited: false,
-    deleted: false,
-    pinned: true,
-    reportCount: 0,
-    moderationFlags: [],
-    sentimentScore: 'neutral',
-    toxicityLevel: 2,
-    reactions: { '👍': 45, '❤️': 23 }
-  },
-  {
-    id: '4',
-    eventId: '1',
-    userId: 'user4',
-    username: 'SpamBot2024',
-    userRole: 'viewer',
-    type: 'text',
-    content: 'GET FREE ROBUX HERE!!! bit.ly/totallylegit-robux HURRY LIMITED TIME!!!',
-    timestamp: Date.now() - 15000,
-    edited: false,
-    deleted: false,
-    pinned: false,
-    reportCount: 8,
-    moderationFlags: ['spam', 'suspicious_link'],
-    isSpam: true,
-    containsLinks: true,
-    reactions: {}
-  }
-];
-
-const mockAlerts: ModerationAlert[] = [
-  {
-    id: '1',
-    eventId: '1',
-    type: 'toxicity',
-    severity: 'high',
-    title: 'High Toxicity Detected',
-    message: 'Message from ToxicTroll99 flagged for toxic content (89% toxicity score)',
-    timestamp: Date.now() - 25000,
-    messageId: '2',
-    userId: 'user2',
-    resolved: false,
-    autoGenerated: true,
-    requiresAction: true,
-    metadata: { toxicityScore: 89, reportCount: 3 }
-  },
-  {
-    id: '2',
-    eventId: '1',
-    type: 'spam',
-    severity: 'critical',
-    title: 'Spam Link Detected',
-    message: 'SpamBot2024 posted suspicious link with spam content',
-    timestamp: Date.now() - 15000,
-    messageId: '4',
-    userId: 'user4',
-    resolved: false,
-    autoGenerated: true,
-    requiresAction: true,
-    metadata: { linkCount: 1, spamScore: 95 }
-  }
-];
+// Interface for typing users
+interface TypingUser {
+  userId: string;
+  username: string;
+  lastTyping: number;
+}
 
 export default function ChatModerationPage() {
+  // Auth context
+  const { user } = useAuth();
+  
   // State management
-  const [selectedEventId, setSelectedEventId] = useState<string>('1');
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [multiView, setMultiView] = useState(false);
-  const [multiViewEvents, setMultiViewEvents] = useState<string[]>(['1', '2']);
-  const [activeEvents] = useState<EventChatSummary[]>(mockActiveEvents);
-  const [messages] = useState<ChatMessage[]>(mockMessages);
-  const [alerts, setAlerts] = useState<ModerationAlert[]>(mockAlerts);
+  const [multiViewEvents, setMultiViewEvents] = useState<string[]>([]);
+  const [activeEvents, setActiveEvents] = useState<EventChatSummary[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [alerts, setAlerts] = useState<ModerationAlert[]>([]);
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [autoScroll, setAutoScroll] = useState(true);
@@ -224,12 +70,70 @@ export default function ChatModerationPage() {
     flagged: false,
     reported: false
   });
+  
+  // Real-time state
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'disconnected'>('disconnected');
+  const [typingUsers, setTypingUsers] = useState<Map<string, TypingUser>>(new Map());
+  const [messageInput, setMessageInput] = useState('');
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  
+  // Refs
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // WebSocket integration
-  const { subscribe, isConnected } = useWebSocket();
-
-  // Get current event
+  // Get current event and initialize WebSocket connection
   const currentEvent = activeEvents.find(e => e.eventId === selectedEventId);
+  
+  // Load active events from API
+  useEffect(() => {
+    loadActiveEvents();
+  }, []);
+  
+  const loadActiveEvents = async () => {
+    setIsLoadingEvents(true);
+    try {
+      const events = await apiClient.getEvents();
+      // Filter for active events only
+      const activeEventsData = events.filter((event: any) => 
+        event.status === 'active' || event.status === 'live'
+      ).map((event: any) => ({
+        eventId: event.id,
+        eventTitle: event.title || event.name,
+        status: event.status,
+        participantCount: event.participant_count || 0,
+        messageCount: event.message_count || 0,
+        messagesPerMinute: event.messages_per_minute || 0,
+        moderatorCount: event.moderator_count || 0,
+        pendingActions: event.pending_actions || 0,
+        alertCount: event.alert_count || { critical: 0, high: 0, medium: 0, low: 0 },
+        lastActivity: event.last_activity || Date.now(),
+        chatEnabled: event.chat_enabled !== false,
+        slowMode: event.slow_mode || false,
+        slowModeDelay: event.slow_mode_delay || 0,
+        subscriberOnly: event.subscriber_only || false,
+        moderatedMode: event.moderated_mode || false,
+        emotesOnly: event.emotes_only || false,
+        linksDisabled: event.links_disabled || false
+      }));
+      
+      setActiveEvents(activeEventsData);
+      
+      // Auto-select first event if available
+      if (activeEventsData.length > 0 && !selectedEventId) {
+        setSelectedEventId(activeEventsData[0].eventId);
+      }
+    } catch (error) {
+      console.log('Failed to load events:', error);
+      // Just show empty state
+      setActiveEvents([]);
+      setMessages([]);
+      setAlerts([]);
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  };
   
   // Filter messages based on current selection and filters
   const filteredMessages = useMemo(() => {
@@ -271,27 +175,257 @@ export default function ChatModerationPage() {
   const pendingAlertsCount = alerts.filter(a => !a.resolved).length;
   const criticalAlertsCount = alerts.filter(a => a.severity === 'critical' && !a.resolved).length;
 
+  // Initialize WebSocket connection when event is selected
+  useEffect(() => {
+    if (!selectedEventId) return;
+    
+    // Try to connect WebSocket (will fail silently if backend not available)
+    const connectWebSocket = async () => {
+      try {
+        await wsService.connect(selectedEventId, { silent: true });
+        setConnectionStatus('connected');
+      } catch (error) {
+        console.log('WebSocket connection failed:', error);
+        setConnectionStatus('disconnected');
+      }
+    };
+    
+    if (selectedEventId) {
+      connectWebSocket();
+    }
+    
+    return () => {
+      if (selectedEventId) {
+        wsService.disconnect();
+      }
+    };
+  }, [selectedEventId]);
+  
   // WebSocket event handlers
   useEffect(() => {
-    const unsubscribers = [
-      subscribe('chat:message', (data: ChatMessage) => {
-        // Handle new message
-        console.log('New chat message:', data);
+    // Subscribe to WebSocket events
+    const unsubscribers: (() => void)[] = [
+      wsService.onWithUnsubscribe('connected', () => {
+        setConnectionStatus('connected');
+        // Rejoin event if we have one selected
+        if (selectedEventId) {
+          wsService.joinEvent(selectedEventId);
+          loadChatHistory(selectedEventId);
+        }
       }),
-      subscribe('chat:alert', (data: ModerationAlert) => {
+      
+      wsService.onWithUnsubscribe('disconnected', () => {
+        setConnectionStatus('disconnected');
+      }),
+      
+      wsService.onWithUnsubscribe('reconnecting', (attemptNumber: number) => {
+        setConnectionStatus('connecting');
+        console.log(`Reconnecting... attempt ${attemptNumber}`);
+      }),
+      
+      wsService.onWithUnsubscribe('chat:message', (data: ChatMessage) => {
+        // Add new message to the list
+        setMessages(prev => {
+          // Check for duplicate message IDs
+          if (prev.some(m => m.id === data.id)) {
+            return prev;
+          }
+          return [...prev, {
+            ...data,
+            timestamp: data.timestamp || Date.now()
+          }];
+        });
+        
+        // Auto-scroll if enabled
+        if (autoScroll && scrollAreaRef.current) {
+          setTimeout(() => {
+            scrollAreaRef.current?.scrollTo({
+              top: scrollAreaRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+          }, 100);
+        }
+      }),
+      
+      wsService.onWithUnsubscribe('chat:typing', (data: any) => {
+        // Update typing users
+        if (data.userId !== user?.id) {
+          setTypingUsers(prev => {
+            const newMap = new Map(prev);
+            if (data.isTyping) {
+              newMap.set(data.userId, {
+                userId: data.userId,
+                username: data.username || 'User',
+                lastTyping: Date.now()
+              });
+            } else {
+              newMap.delete(data.userId);
+            }
+            return newMap;
+          });
+        }
+      }),
+      
+      wsService.onWithUnsubscribe('chat:user_joined', (data: any) => {
+        // Add system message for user joining
+        const systemMessage: ChatMessage = {
+          id: `sys-join-${Date.now()}`,
+          eventId: selectedEventId,
+          userId: 'system',
+          username: 'System',
+          userRole: 'viewer',
+          type: 'system',
+          content: `${data.username} joined the chat`,
+          timestamp: Date.now(),
+          edited: false,
+          deleted: false,
+          pinned: false,
+          reportCount: 0,
+          moderationFlags: [],
+          reactions: {}
+        };
+        setMessages(prev => [...prev, systemMessage]);
+      }),
+      
+      wsService.onWithUnsubscribe('chat:user_left', (data: any) => {
+        // Add system message for user leaving
+        const systemMessage: ChatMessage = {
+          id: `sys-left-${Date.now()}`,
+          eventId: selectedEventId,
+          userId: 'system',
+          username: 'System',
+          userRole: 'viewer',
+          type: 'system',
+          content: `${data.username} left the chat`,
+          timestamp: Date.now(),
+          edited: false,
+          deleted: false,
+          pinned: false,
+          reportCount: 0,
+          moderationFlags: [],
+          reactions: {}
+        };
+        setMessages(prev => [...prev, systemMessage]);
+        
+        // Remove from typing users if they were typing
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(data.userId);
+          return newMap;
+        });
+      }),
+      
+      wsService.onWithUnsubscribe('chat:alert', (data: ModerationAlert) => {
         setAlerts(prev => [data, ...prev]);
         if (soundAlerts && data.severity === 'critical') {
-          // Play alert sound
+          // Play alert sound (could add actual audio here)
           console.log('Critical alert sound');
+        }
+      }),
+      
+      wsService.onWithUnsubscribe('chat:history', (data: any) => {
+        // Handle chat history response
+        if (data.messages && Array.isArray(data.messages)) {
+          setMessages(data.messages);
         }
       })
     ];
 
+    // Clean up typing users periodically
+    const typingCleanupInterval = setInterval(() => {
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        const now = Date.now();
+        for (const [userId, user] of newMap) {
+          if (now - user.lastTyping > 5000) {
+            newMap.delete(userId);
+          }
+        }
+        return newMap;
+      });
+    }, 1000);
+    
     return () => {
       unsubscribers.forEach(unsub => unsub());
+      clearInterval(typingCleanupInterval);
     };
-  }, [subscribe, soundAlerts]);
+  }, [selectedEventId, autoScroll, soundAlerts, user]);
+  
+  // Load chat history from API
+  const loadChatHistory = async (eventId: string) => {
+    setIsLoadingHistory(true);
+    try {
+      const history = await apiClient.getChatHistory(eventId);
+      if (history && Array.isArray(history)) {
+        setMessages(history.map((msg: any) => ({
+          id: msg.id || `msg-${Date.now()}-${Math.random()}`,
+          eventId: msg.event_id || eventId,
+          userId: msg.user_id || msg.userId,
+          username: msg.username || 'Anonymous',
+          userRole: msg.user_role || msg.userRole || 'viewer',
+          avatar: msg.avatar,
+          type: msg.type || 'text',
+          content: msg.content || msg.message,
+          timestamp: msg.timestamp || msg.created_at || Date.now(),
+          edited: msg.edited || false,
+          deleted: msg.deleted || false,
+          pinned: msg.pinned || false,
+          reportCount: msg.report_count || 0,
+          moderationFlags: msg.moderation_flags || [],
+          sentimentScore: msg.sentiment_score,
+          toxicityLevel: msg.toxicity_level,
+          isSpam: msg.is_spam,
+          containsLinks: msg.contains_links,
+          reactions: msg.reactions || {}
+        })));
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
 
+  // Send chat message
+  const sendMessage = useCallback(async () => {
+    if (!messageInput.trim() || !selectedEventId) return;
+    
+    const message = messageInput.trim();
+    setMessageInput('');
+    
+    // Send via WebSocket if connected, otherwise use API
+    if (wsService.isConnected()) {
+      wsService.sendChatMessage(message);
+    } else {
+      // Fallback to API
+      try {
+        await apiClient.sendChatMessage(selectedEventId, message);
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        // Restore message on error
+        setMessageInput(message);
+      }
+    }
+  }, [messageInput, selectedEventId, user]);
+  
+  // Handle typing indicator
+  const handleTyping = useCallback(() => {
+    if (!selectedEventId || !wsService.isConnected()) return;
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Send typing indicator
+    wsService.sendTypingIndicator(selectedEventId, true);
+    
+    // Stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      wsService.sendTypingIndicator(selectedEventId, false);
+    }, 2000);
+  }, [selectedEventId]);
+  
   // Moderation actions
   const handleModerationAction = useCallback(async (messageId: string, action: ModerationAction, reason?: string, duration?: number) => {
     try {
@@ -359,8 +493,17 @@ export default function ChatModerationPage() {
       subtitle="Monitor and manage chat across all active events"
       actions={
         <div className="flex gap-2">
-          <Badge variant={isConnected() ? 'default' : 'destructive'}>
-            {isConnected() ? 'Connected' : 'Disconnected'}
+          <Badge 
+            variant={connectionStatus === 'connected' ? 'default' : connectionStatus === 'connecting' ? 'secondary' : 'destructive'}
+            className="flex items-center gap-1"
+          >
+            {connectionStatus === 'connected' ? (
+              <><Wifi className="h-3 w-3" /> Connected</>
+            ) : connectionStatus === 'connecting' ? (
+              <><RefreshCw className="h-3 w-3 animate-spin" /> Connecting...</>
+            ) : (
+              <><WifiOff className="h-3 w-3" /> Disconnected</>
+            )}
           </Badge>
           {criticalAlertsCount > 0 && (
             <Badge variant="destructive" className="animate-pulse">
@@ -384,6 +527,26 @@ export default function ChatModerationPage() {
     >
       <div className="space-y-6">
         {/* Event Selector and Controls */}
+        {isLoadingEvents ? (
+          <Card>
+            <CardContent className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+              <span className="ml-2">Loading events...</span>
+            </CardContent>
+          </Card>
+        ) : activeEvents.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-8">
+              <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-600">No active events available</p>
+              <p className="text-sm text-gray-500 mt-1">Events with active chat will appear here</p>
+              <Button onClick={loadActiveEvents} className="mt-4">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh Events
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -473,6 +636,7 @@ export default function ChatModerationPage() {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Main Content Area */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -599,7 +763,14 @@ export default function ChatModerationPage() {
               </CardHeader>
               
               <CardContent className="flex-1 flex flex-col p-0">
-                <ScrollArea className="flex-1 px-6">
+                {isLoadingHistory && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                    <span className="ml-2 text-sm text-gray-500">Loading chat history...</span>
+                  </div>
+                )}
+                
+                <ScrollArea className="flex-1 px-6" ref={scrollAreaRef}>
                   <div className="space-y-4 py-4">
                     {filteredMessages.map((message) => {
                       const isSelected = selectedMessages.has(message.id);
@@ -743,23 +914,111 @@ export default function ChatModerationPage() {
                         </div>
                       );
                     })}
+                    
+                    {/* Typing indicators */}
+                    {typingUsers.size > 0 && (
+                      <div className="flex items-center gap-2 p-3 text-sm text-gray-500">
+                        <div className="flex gap-1">
+                          <span className="animate-bounce" style={{ animationDelay: '0ms' }}>●</span>
+                          <span className="animate-bounce" style={{ animationDelay: '150ms' }}>●</span>
+                          <span className="animate-bounce" style={{ animationDelay: '300ms' }}>●</span>
+                        </div>
+                        <span>
+                          {Array.from(typingUsers.values())
+                            .slice(0, 3)
+                            .map(u => u.username)
+                            .join(', ')}
+                          {typingUsers.size > 3 && ` and ${typingUsers.size - 3} others`}
+                          {typingUsers.size === 1 ? ' is' : ' are'} typing...
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
                 
-                {/* Quick select actions */}
-                <div className="border-t p-3">
-                  <div className="flex justify-between items-center text-sm">
+                {/* Message input area */}
+                <div className="border-t p-4">
+                  <div className="space-y-3">
+                    {/* Quick select actions for moderators */}
+                    {user?.role === 'moderator' || user?.role === 'admin' || user?.role === 'platform_admin' ? (
+                      <div className="flex justify-between items-center text-sm mb-3">
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={selectAllMessages}>
+                            Select All ({filteredMessages.length})
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={clearSelection}>
+                            Clear Selection
+                          </Button>
+                        </div>
+                        <span className="text-gray-500">
+                          {filteredMessages.length} messages • {selectedMessages.size} selected
+                        </span>
+                      </div>
+                    ) : null}
+                    
+                    {/* Message input */}
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={selectAllMessages}>
-                        Select All ({filteredMessages.length})
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={clearSelection}>
-                        Clear Selection
+                      <Textarea
+                        ref={messageInputRef}
+                        value={messageInput}
+                        onChange={(e) => {
+                          setMessageInput(e.target.value);
+                          handleTyping();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                          }
+                        }}
+                        placeholder={
+                          connectionStatus === 'connected' 
+                            ? `Send a message to ${currentEvent?.eventTitle || 'chat'}...`
+                            : connectionStatus === 'connecting'
+                            ? 'Connecting to chat...'
+                            : 'Chat disconnected - reconnecting...'
+                        }
+                        disabled={connectionStatus !== 'connected' || !currentEvent?.chatEnabled}
+                        className="flex-1 min-h-[60px] max-h-[120px] resize-none"
+                      />
+                      <Button 
+                        onClick={sendMessage}
+                        disabled={!messageInput.trim() || connectionStatus !== 'connected' || !currentEvent?.chatEnabled}
+                        size="icon"
+                        className="h-[60px] w-[60px]"
+                      >
+                        <Send className="h-5 w-5" />
                       </Button>
                     </div>
-                    <span className="text-gray-500">
-                      {filteredMessages.length} messages • {selectedMessages.size} selected
-                    </span>
+                    
+                    {/* Chat status indicators */}
+                    {currentEvent && (
+                      <div className="flex gap-2 text-xs">
+                        {currentEvent.slowMode && (
+                          <Badge variant="outline" className="text-xs">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Slow mode: {currentEvent.slowModeDelay}s
+                          </Badge>
+                        )}
+                        {currentEvent.subscriberOnly && (
+                          <Badge variant="outline" className="text-xs">
+                            <Users className="h-3 w-3 mr-1" />
+                            Subscribers only
+                          </Badge>
+                        )}
+                        {currentEvent.moderatedMode && (
+                          <Badge variant="outline" className="text-xs">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Moderated
+                          </Badge>
+                        )}
+                        {!currentEvent.chatEnabled && (
+                          <Badge variant="destructive" className="text-xs">
+                            Chat disabled
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

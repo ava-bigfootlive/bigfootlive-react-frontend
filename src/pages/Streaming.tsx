@@ -65,22 +65,24 @@ export default function StreamingPage() {
       setLoading(true);
       setError('');
       
-      const response = await api.post('/streaming/events', {
+      // Create event using the API client
+      const response = await api.createEvent({
         name: eventName,
         description: eventDescription,
+        status: 'scheduled'
       });
 
-      if (response.data) {
+      if (response) {
         setStreamConfig({
-          eventId: response.data.id,
-          streamKey: response.data.streamKey,
-          rtmpUrl: response.data.rtmpUrl,
-          hlsUrl: response.data.hlsUrl,
+          eventId: response.id,
+          streamKey: response.streamKey || `stream_${response.id}`,
+          rtmpUrl: response.rtmpUrl || 'rtmp://stream.bigfootlive.io/live',
+          hlsUrl: response.hlsUrl || `https://stream.bigfootlive.io/hls/${response.id}/index.m3u8`,
           status: 'preparing'
         });
       }
     } catch (error: any) {
-      setError(error.response?.data?.detail || 'Failed to create streaming event');
+      setError(error.message || 'Failed to create streaming event');
     } finally {
       setLoading(false);
     }
@@ -96,12 +98,8 @@ export default function StreamingPage() {
       setLoading(true);
       setError('');
       
-      await api.post(`/streaming/events/${streamConfig.eventId}/start`);
-      
-      setStreamConfig(prev => ({ ...prev, status: 'live' }));
-      
-      // Navigate to live streaming view
-      navigate('/streaming/live', { state: { streamConfig } });
+      // Navigate to live streaming view with eventId
+      navigate('/streaming/live', { state: { eventId: streamConfig.eventId } });
     } catch (error: any) {
       setError(error.response?.data?.detail || 'Failed to start stream');
     } finally {

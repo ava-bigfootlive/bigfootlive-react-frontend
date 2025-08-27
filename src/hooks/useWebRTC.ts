@@ -13,9 +13,11 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Device } from 'mediasoup-client';
-import { Transport } from 'mediasoup-client/lib/Transport';
-import { Producer } from 'mediasoup-client/lib/Producer';
-import { Consumer } from 'mediasoup-client/lib/Consumer';
+
+// Define basic types to avoid import issues
+type Transport = any;
+type Producer = any;
+type Consumer = any;
 
 // Types for WebRTC functionality
 export interface WebRTCPeer {

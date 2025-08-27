@@ -1,25 +1,33 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/Layout/ProtectedRoute';
 import { Toaster } from './components/ui/toaster';
 import { useEffect } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
+import { errorHandler } from './utils/errorHandler';
+import { networkMonitor } from './utils/networkMonitor';
 
 // Pages
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
-import DashboardPage from './pages/Dashboard';
+import DashboardPage from './pages/DashboardEnhanced';
 import VODUploadPage from './pages/VODUpload';
 import StreamingLivePage from './pages/StreamingLive';
 import PlatformAdminPage from './pages/PlatformAdmin';
 import SelectTenantPage from './pages/SelectTenant';
 import UnauthorizedPage from './pages/Unauthorized';
 import UserManagementPage from './pages/UserManagement';
-import AnalyticsPage from './pages/Analytics';
+import NotFound from './pages/ErrorPages/NotFound';
+import ServerError from './pages/ErrorPages/ServerError';
+import Forbidden from './pages/ErrorPages/Forbidden';
+import AnalyticsPage from './pages/AnalyticsSimple';
 import ChatPage from './pages/Chat';
 import DocumentationPage from './pages/Documentation';
-import EventsPage from './pages/Events';
+import { EventsPage } from './pages/Events';
 import LandingPage from './pages/Landing';
+import MediaAssetsPage from './pages/MediaAssets';
+import VideoPlayerTestPage from './pages/VideoPlayerTest';
 
 function App() {
   // Initialize theme on app load
@@ -34,16 +42,61 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, []);
+
+  // Setup global error handlers
+  useEffect(() => {
+    // Handle unhandled promise rejections
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      errorHandler.handle(
+        event.reason,
+        'Unhandled Promise Rejection'
+      );
+      // Prevent default browser error handling
+      event.preventDefault();
+    };
+
+    // Handle global JavaScript errors
+    const handleError = (event: ErrorEvent) => {
+      console.error('Global error:', event.error);
+      errorHandler.handle(
+        event.error || new Error(event.message),
+        'JavaScript Error'
+      );
+      // Prevent default browser error handling
+      event.preventDefault();
+    };
+
+    // Add event listeners
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('error', handleError);
+
+    // Network monitor listeners
+    networkMonitor.on('statusChange', (event) => {
+      console.log('Network status changed:', event);
+    });
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('error', handleError);
+      networkMonitor.removeAllListeners();
+    };
+  }, []);
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="/500" element={<ServerError />} />
+          <Route path="/403" element={<Forbidden />} />
           
           {/* Protected Routes */}
           <Route
@@ -126,6 +179,33 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/media-assets"
+            element={
+              <ProtectedRoute>
+                <MediaAssetsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/video-test"
+            element={
+              <ProtectedRoute>
+                <VideoPlayerTestPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
           
           {/* Platform Admin Route */}
           <Route
@@ -137,12 +217,13 @@ function App() {
             }
           />
           
-          {/* 404 - Redirect to landing */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* 404 - Show not found page */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
       </AuthProvider>
     </Router>
+  </ErrorBoundary>
   );
 }
 

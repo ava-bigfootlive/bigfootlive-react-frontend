@@ -43,7 +43,7 @@ import {
   Video,
   VideoOff,
   Share,
-  ShareOff,
+  Share2,
   Hand,
   Users,
   Settings,
@@ -565,7 +565,7 @@ export const MultiPresenter: React.FC<MultiPresenterProps> = ({
           >
             {webrtc.isScreenSharing ? (
               <>
-                <ShareOff className="w-4 h-4 mr-2" />
+                <Share2 className="w-4 h-4 mr-2" />
                 Stop Sharing
               </>
             ) : (
@@ -754,7 +754,7 @@ export const MultiPresenter: React.FC<MultiPresenterProps> = ({
             className="absolute top-4 right-4"
             onClick={handleStopScreenShare}
           >
-            <ShareOff className="w-4 h-4 mr-2" />
+            <Share2 className="w-4 h-4 mr-2" />
             Stop Sharing
           </Button>
         </div>

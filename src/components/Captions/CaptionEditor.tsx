@@ -116,45 +116,49 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({
   const redoStack = useRef<CaptionSegment[]>([]);
 
   // WebSocket connections
-  const { isConnected: isLiveConnected, messages: liveMessages } = useWebSocket(
-    `ws://localhost:8000/captions/sessions/${sessionId}/live`,
-    {
-      onMessage: (message) => {
-        if (message.type === 'captions') {
-          setSegments(prev => {
-            const newSegments = [...prev];
-            message.captions.forEach((caption: CaptionSegment) => {
-              const existingIndex = newSegments.findIndex(s => s.id === caption.id);
-              if (existingIndex >= 0) {
-                newSegments[existingIndex] = caption;
-              } else {
-                newSegments.push(caption);
-              }
-            });
-            return newSegments.sort((a, b) => a.start_time - b.start_time);
+  // Use WebSocket only when needed for captions, silent mode
+  const { isConnected: isLiveConnected, messages: liveMessages, subscribe } = useWebSocket({ autoConnect: false, silent: true });
+  const isCorrectionConnected = isLiveConnected;
+  
+  // Setup WebSocket subscriptions
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const unsubscribeLive = subscribe('captions', (message: any) => {
+      if (message.type === 'captions') {
+        setSegments(prev => {
+          const newSegments = [...prev];
+          message.captions.forEach((caption: CaptionSegment) => {
+            const existingIndex = newSegments.findIndex(s => s.id === caption.id);
+            if (existingIndex >= 0) {
+              newSegments[existingIndex] = caption;
+            } else {
+              newSegments.push(caption);
+            }
           });
-        }
+          return newSegments.sort((a, b) => a.start_time - b.start_time);
+        });
       }
-    }
-  );
-
-  const { isConnected: isCorrectionConnected } = useWebSocket(
-    `ws://localhost:8000/captions/sessions/${sessionId}/corrections`,
-    {
-      onMessage: (message) => {
-        if (message.type === 'correction') {
-          // Update segment with correction
-          setSegments(prev => 
-            prev.map(segment => 
-              segment.id === message.segment_id 
-                ? { ...segment, final_text: message.corrected_text, is_corrected: true }
-                : segment
-            )
-          );
-        }
+    });
+    
+    const unsubscribeCorrection = subscribe('correction', (message: any) => {
+      if (message.type === 'correction') {
+        // Update segment with correction
+        setSegments(prev => 
+          prev.map(segment => 
+            segment.id === message.segment_id 
+              ? { ...segment, final_text: message.corrected_text, is_corrected: true }
+              : segment
+          )
+        );
       }
-    }
-  );
+    });
+    
+    return () => {
+      unsubscribeLive();
+      unsubscribeCorrection();
+    };
+  }, [sessionId, subscribe]);
 
   // Load existing segments and corrections
   useEffect(() => {
@@ -395,7 +399,11 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({
 
     return (
       <Card
-        ref={el => el && segmentRefs.current.set(segment.id, el)}
+        ref={el => {
+          if (el) {
+            segmentRefs.current.set(segment.id, el);
+          }
+        }}
         className={cn(
           "p-3 mb-2 transition-all duration-200 hover:shadow-md cursor-pointer",
           isSelected && "ring-2 ring-blue-500",

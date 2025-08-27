@@ -30,6 +30,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  tenant?: string;
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
@@ -47,6 +48,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [tenant, setTenant] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                             hostname === 'www.bigfootlive.io';
         const isCloudFront = hostname === 'd2dbuyze4zqbdy.cloudfront.net';
         const isLocalhost = hostname === 'localhost';
+        
+        // Set tenant based on context
+        const currentTenant = userTenantId || (isLocalhost ? 'default' : tenantFromDomain);
+        setTenant(currentTenant);
         
         // If user is on main domain and has a tenant (not platform admin), redirect to their tenant
         if (isMainDomain && userTenantId && !isPlatformAdmin) {
@@ -330,6 +336,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider 
       value={{
         user,
+        tenant,
         isLoading,
         isInitialized,
         error,

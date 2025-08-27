@@ -238,32 +238,37 @@ export const useCaptionSegments = (sessionId: string) => {
   const [error, setError] = useState<string | null>(null);
 
   // WebSocket for real-time caption updates
-  const { isConnected, messages } = useWebSocket(
-    sessionId ? `ws://localhost:8000/captions/sessions/${sessionId}/live` : null,
-    {
-      onMessage: (message) => {
-        if (message.type === 'captions' && message.captions) {
-          setSegments(prevSegments => {
-            const newSegments = [...prevSegments];
-            
-            message.captions.forEach((caption: CaptionSegment) => {
-              const existingIndex = newSegments.findIndex(s => s.id === caption.id);
-              if (existingIndex >= 0) {
-                newSegments[existingIndex] = caption;
-              } else {
-                newSegments.push(caption);
-              }
-            });
-
-            // Sort by start time and keep only recent segments
-            return newSegments
-              .sort((a, b) => a.start_time - b.start_time)
-              .slice(-200); // Keep last 200 segments
+  const { isConnected, messages, subscribe } = useWebSocket();
+  
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const unsubscribe = subscribe('captions', (message: any) => {
+      if (message.type === 'captions' && message.captions) {
+        setSegments(prevSegments => {
+          const newSegments = [...prevSegments];
+          
+          message.captions.forEach((caption: CaptionSegment) => {
+            const existingIndex = newSegments.findIndex(s => s.id === caption.id);
+            if (existingIndex >= 0) {
+              newSegments[existingIndex] = caption;
+            } else {
+              newSegments.push(caption);
+            }
           });
-        }
-      },
-    }
-  );
+
+          // Sort by start time and keep only recent segments
+          return newSegments
+            .sort((a, b) => a.start_time - b.start_time)
+            .slice(-200); // Keep last 200 segments
+        });
+      }
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, [sessionId, subscribe]);
 
   const fetchSegments = useCallback(async (
     startTime?: number,
@@ -345,16 +350,21 @@ export const useCaptionCorrections = (sessionId: string) => {
   const [error, setError] = useState<string | null>(null);
 
   // WebSocket for real-time correction updates
-  const { isConnected } = useWebSocket(
-    sessionId ? `ws://localhost:8000/captions/sessions/${sessionId}/corrections` : null,
-    {
-      onMessage: (message) => {
-        if (message.type === 'correction') {
-          setCorrections(prev => [...prev, message.correction]);
-        }
-      },
-    }
-  );
+  const { isConnected, subscribe } = useWebSocket();
+  
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const unsubscribe = subscribe('correction', (message: any) => {
+      if (message.type === 'correction') {
+        setCorrections(prev => [...prev, message.correction]);
+      }
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, [sessionId, subscribe]);
 
   const fetchCorrections = useCallback(async () => {
     if (!sessionId) return;

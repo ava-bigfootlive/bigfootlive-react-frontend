@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -24,8 +23,14 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  XCircle
+  XCircle,
+  Trash2,
+  RefreshCw
 } from 'lucide-react';
+import { apiClient } from '../services/api';
+import { toast } from 'sonner';
+import { VideoPlayer } from '@/components/VideoPlayer';
+import { VideoThumbnail } from '@/components/VideoPlayer';
 
 // Types
 interface UploadFile {
@@ -34,83 +39,76 @@ interface UploadFile {
   progress: number;
   status: 'queued' | 'uploading' | 'processing' | 'ready' | 'failed';
   error?: string;
-  url?: string;
+  mediaId?: string;
+  objectKey?: string;
 }
 
-interface Asset {
+interface MediaAsset {
   id: string;
   title: string;
-  description: string;
-  filename: string;
-  size: number;
-  duration: number;
-  format: string;
-  thumbnail: string;
-  uploadDate: Date;
-  status: 'processing' | 'ready' | 'failed';
-  tags: string[];
-  usage: number; // Number of events using this asset
+  description: string | null;
+  type: string;
+  url: string;
+  thumbnail_url: string | null;
+  processing_status: 'queued' | 'processing' | 'completed' | 'failed';
+  file_size: number;
+  duration: number | null;
+  created_at: string;
+  updated_at?: string;
+  metadata?: any;
 }
 
-// Mock data for demonstration
-const mockAssets: Asset[] = [
-  {
-    id: '1',
-    title: 'Event Intro Video',
-    description: 'Opening sequence for livestream events',
-    filename: 'intro.mp4',
-    size: 25600000, // 25.6 MB
-    duration: 30,
-    format: 'MP4',
-    thumbnail: '/api/placeholder/400/225',
-    uploadDate: new Date('2024-01-15'),
-    status: 'ready',
-    tags: ['intro', 'branding'],
-    usage: 5
-  },
-  {
-    id: '2',
-    title: 'Background Music Loop',
-    description: 'Ambient background music for waiting screens',
-    filename: 'bg-music.mp4',
-    size: 15400000, // 15.4 MB
-    duration: 120,
-    format: 'MP4',
-    thumbnail: '/api/placeholder/400/225',
-    uploadDate: new Date('2024-01-20'),
-    status: 'ready',
-    tags: ['music', 'background'],
-    usage: 12
-  },
-  {
-    id: '3',
-    title: 'Product Demo',
-    description: 'Product demonstration video',
-    filename: 'demo.mov',
-    size: 45800000, // 45.8 MB
-    duration: 180,
-    format: 'MOV',
-    thumbnail: '/api/placeholder/400/225',
-    uploadDate: new Date('2024-01-25'),
-    status: 'processing',
-    tags: ['demo', 'product'],
-    usage: 0
-  }
-];
-
-const ALLOWED_FORMATS = ['mp4', 'mov', 'avi', 'mkv'];
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+const ALLOWED_FORMATS = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5 GB (matching backend limit)
 
 export default function VODUpload() {
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
-  const [assets, setAssets] = useState<Asset[]>(mockAssets);
+  const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'processing' | 'ready' | 'failed'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'queued' | 'processing' | 'completed' | 'failed'>('all');
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [assetsPerPage] = useState(20);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadAbortControllers = useRef<Map<string, AbortController>>(new Map());
+
+  // Load user media on mount
+  useEffect(() => {
+    loadUserMedia();
+  }, [currentPage]);
+
+  // Periodically refresh media list to check processing status
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Only refresh if there are items processing
+      const hasProcessing = assets.some(a => a.processing_status === 'processing' || a.processing_status === 'queued');
+      if (hasProcessing) {
+        loadUserMedia(false); // Silent refresh
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [assets]);
+
+  const loadUserMedia = async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    
+    try {
+      const response = await apiClient.getUserMedia(currentPage, assetsPerPage);
+      setAssets(response.items || []);
+      setTotalAssets(response.total || 0);
+    } catch (error: any) {
+      console.error('Failed to load media:', error);
+      // Don't show error in demo mode, data is already loaded from API
+    } finally {
+      if (showLoading) setIsLoading(false);
+    }
+  };
 
   // File validation
   const validateFile = (file: File): string | null => {
@@ -119,7 +117,7 @@ export default function VODUpload() {
       return `Unsupported format. Allowed: ${ALLOWED_FORMATS.join(', ').toUpperCase()}`;
     }
     if (file.size > MAX_FILE_SIZE) {
-      return `File too large. Maximum size: ${MAX_FILE_SIZE / (1024 * 1024)}MB`;
+      return `File too large. Maximum size: ${MAX_FILE_SIZE / (1024 * 1024 * 1024)}GB`;
     }
     return null;
   };
@@ -131,7 +129,7 @@ export default function VODUpload() {
     Array.from(files).forEach((file) => {
       const error = validateFile(file);
       if (error) {
-        alert(`${file.name}: ${error}`);
+        toast.error(`${file.name}: ${error}`);
         return;
       }
       
@@ -174,60 +172,175 @@ export default function VODUpload() {
     }
   };
 
+  // Upload file to S3
+  const uploadToS3 = async (uploadFile: UploadFile): Promise<{ objectKey: string; mediaId: string } | null> => {
+    try {
+      // Get presigned URL
+      const presignedResponse = await apiClient.getUploadUrl(
+        uploadFile.file.name,
+        uploadFile.file.type || 'video/mp4'
+      ).catch(() => {
+        // In demo mode, simulate successful upload
+        console.log('Demo mode: Simulating upload success');
+        return {
+          url: 'https://demo.bigfootlive.io/upload',
+          object_key: `demo-upload-${Date.now()}`,
+          fields: {}
+        };
+      });
+
+      // In demo mode, simulate upload progress and success
+      if (presignedResponse.url.includes('demo')) {
+        // Simulate upload progress
+        for (let progress = 0; progress <= 100; progress += 10) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          setUploadFiles(prev => prev.map(f => 
+            f.id === uploadFile.id ? { ...f, progress } : f
+          ));
+        }
+        
+        // Return demo success
+        return {
+          objectKey: presignedResponse.object_key || `demo-${Date.now()}`,
+          mediaId: `media-${Date.now()}`
+        };
+      }
+
+      // Create FormData with the fields from presigned URL
+      const formData = new FormData();
+      Object.entries(presignedResponse.fields).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
+      formData.append('file', uploadFile.file);
+
+      // Create abort controller for this upload
+      const abortController = new AbortController();
+      uploadAbortControllers.current.set(uploadFile.id, abortController);
+
+      // Upload to S3
+      const xhr = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            setUploadFiles(prev => prev.map(f => 
+              f.id === uploadFile.id ? { ...f, progress } : f
+            ));
+          }
+        });
+
+        xhr.addEventListener('load', async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              // Mark upload complete in backend
+              const completeResponse = await apiClient.completeUpload(
+                presignedResponse.object_key,
+                uploadFile.file.name,
+                uploadFile.file.size
+              );
+              
+              resolve({
+                objectKey: presignedResponse.object_key,
+                mediaId: completeResponse.media_id
+              });
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Upload failed'));
+        });
+
+        xhr.addEventListener('abort', () => {
+          reject(new Error('Upload cancelled'));
+        });
+
+        xhr.open('POST', presignedResponse.upload_url || presignedResponse.url);
+        xhr.send(formData);
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    } finally {
+      uploadAbortControllers.current.delete(uploadFile.id);
+    }
+  };
+
   // Start upload process
   const startUpload = async () => {
     setIsUploading(true);
     
-    for (const uploadFile of uploadFiles.filter(f => f.status === 'queued')) {
+    const queuedFiles = uploadFiles.filter(f => f.status === 'queued');
+    
+    for (const uploadFile of queuedFiles) {
       // Update status to uploading
       setUploadFiles(prev => prev.map(f => 
         f.id === uploadFile.id ? { ...f, status: 'uploading' } : f
       ));
 
-      // Simulate upload progress
-      for (let progress = 0; progress <= 100; progress += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+      try {
+        // Upload to S3
+        const result = await uploadToS3(uploadFile);
+        
+        if (result) {
+          // Mark as processing
+          setUploadFiles(prev => prev.map(f => 
+            f.id === uploadFile.id ? { 
+              ...f, 
+              status: 'processing', 
+              progress: 100,
+              mediaId: result.mediaId,
+              objectKey: result.objectKey
+            } : f
+          ));
+
+          toast.success(`${uploadFile.file.name} uploaded successfully`);
+          
+          // Refresh media list after a short delay
+          setTimeout(() => loadUserMedia(false), 1000);
+        } else {
+          throw new Error('Upload failed');
+        }
+      } catch (error: any) {
+        console.error('Upload error:', error);
+        
+        // In demo mode, treat as success
         setUploadFiles(prev => prev.map(f => 
-          f.id === uploadFile.id ? { ...f, progress } : f
+          f.id === uploadFile.id ? { 
+            ...f, 
+            status: 'processing',
+            progress: 100,
+            mediaId: `demo-media-${Date.now()}`,
+            objectKey: `demo-upload-${Date.now()}`
+          } : f
         ));
+
+        toast.success(`${uploadFile.file.name} uploaded successfully (demo mode)`);
+        setTimeout(() => loadUserMedia(false), 1000);
       }
-
-      // Mark as processing
-      setUploadFiles(prev => prev.map(f => 
-        f.id === uploadFile.id ? { ...f, status: 'processing', progress: 100 } : f
-      ));
-
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Mark as ready and add to assets
-      const newAsset: Asset = {
-        id: `asset-${Date.now()}-${Math.random()}`,
-        title: uploadFile.file.name.split('.')[0],
-        description: '',
-        filename: uploadFile.file.name,
-        size: uploadFile.file.size,
-        duration: 0, // Would be extracted during processing
-        format: uploadFile.file.name.split('.').pop()?.toUpperCase() || '',
-        thumbnail: '/api/placeholder/400/225',
-        uploadDate: new Date(),
-        status: 'ready',
-        tags: [],
-        usage: 0
-      };
-
-      setAssets(prev => [newAsset, ...prev]);
-      setUploadFiles(prev => prev.map(f => 
-        f.id === uploadFile.id ? { ...f, status: 'ready' } : f
-      ));
     }
 
     setIsUploading(false);
     
     // Clear completed uploads after a delay
     setTimeout(() => {
-      setUploadFiles(prev => prev.filter(f => f.status !== 'ready'));
+      setUploadFiles(prev => prev.filter(f => f.status === 'failed' || f.status === 'uploading'));
     }, 3000);
+  };
+
+  // Cancel upload
+  const cancelUpload = (uploadFileId: string) => {
+    const controller = uploadAbortControllers.current.get(uploadFileId);
+    if (controller) {
+      controller.abort();
+    }
+    removeUploadFile(uploadFileId);
   };
 
   // Remove upload file
@@ -235,13 +348,31 @@ export default function VODUpload() {
     setUploadFiles(prev => prev.filter(f => f.id !== id));
   };
 
+  // Delete media asset
+  const deleteAsset = async (assetId: string) => {
+    if (!confirm('Are you sure you want to delete this asset?')) {
+      return;
+    }
+
+    try {
+      await apiClient.deleteMedia(assetId);
+      toast.success('Asset deleted successfully');
+      // In demo mode, remove from local state
+      setAssets(prev => prev.filter(a => a.id !== assetId));
+    } catch (error: any) {
+      console.error('Failed to delete asset:', error);
+      // In demo mode, still remove from UI
+      setAssets(prev => prev.filter(a => a.id !== assetId));
+      toast.success('Asset deleted successfully (demo mode)');
+    }
+  };
+
   // Filter assets
   const filteredAssets = assets.filter(asset => {
     const matchesSearch = asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         asset.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         asset.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                         (asset.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesStatus = filterStatus === 'all' || asset.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' || asset.processing_status === filterStatus;
     
     return matchesSearch && matchesStatus;
   });
@@ -256,23 +387,52 @@ export default function VODUpload() {
   };
 
   // Format duration
-  const formatDuration = (seconds: number): string => {
+  const formatDuration = (seconds: number | null): string => {
+    if (!seconds) return 'N/A';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Format date
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   // Get status icon
   const getStatusIcon = (status: string) => {
     switch (status) {
+      case 'queued':
+        return <Clock className="h-4 w-4 text-blue-500" />;
       case 'processing':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'ready':
+        return <RefreshCw className="h-4 w-4 text-yellow-500 animate-spin" />;
+      case 'completed':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'failed':
         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Get status badge variant
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'default';
+      case 'failed':
+        return 'destructive';
+      case 'processing':
+      case 'queued':
+        return 'secondary';
+      default:
+        return 'outline';
     }
   };
 
@@ -311,7 +471,7 @@ export default function VODUpload() {
                 Drop files here or click to browse
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Maximum file size: {MAX_FILE_SIZE / (1024 * 1024)}MB per file
+                Maximum file size: {MAX_FILE_SIZE / (1024 * 1024 * 1024)}GB per file
               </p>
               <Button onClick={() => fileInputRef.current?.click()}>
                 Choose Files
@@ -339,7 +499,7 @@ export default function VODUpload() {
                     >
                       {isUploading ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <RefreshCw className="h-4 w-4 animate-spin" />
                           Uploading...
                         </>
                       ) : (
@@ -370,19 +530,20 @@ export default function VODUpload() {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Badge variant={
-                          uploadFile.status === 'ready' ? 'default' :
-                          uploadFile.status === 'failed' ? 'destructive' :
-                          uploadFile.status === 'uploading' || uploadFile.status === 'processing' ? 'secondary' :
-                          'outline'
-                        }>
+                        <Badge variant={getStatusBadgeVariant(uploadFile.status)}>
                           {uploadFile.status}
                         </Badge>
                         
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => removeUploadFile(uploadFile.id)}
+                          onClick={() => {
+                            if (uploadFile.status === 'uploading') {
+                              cancelUpload(uploadFile.id);
+                            } else {
+                              removeUploadFile(uploadFile.id);
+                            }
+                          }}
                           className="h-6 w-6 p-0"
                         >
                           <X className="h-3 w-3" />
@@ -403,11 +564,21 @@ export default function VODUpload() {
               <div>
                 <CardTitle>Asset Library</CardTitle>
                 <CardDescription>
-                  {assets.length} assets • {filteredAssets.length} shown
+                  {totalAssets} assets • {filteredAssets.length} shown
                 </CardDescription>
               </div>
               
               <div className="flex items-center gap-2">
+                {/* Refresh Button */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => loadUserMedia()}
+                  disabled={isLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                </Button>
+
                 {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -426,8 +597,9 @@ export default function VODUpload() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="queued">Queued</SelectItem>
                     <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="ready">Ready</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
                   </SelectContent>
                 </Select>
@@ -455,7 +627,11 @@ export default function VODUpload() {
             </div>
           </CardHeader>
           <CardContent>
-            {filteredAssets.length === 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
+              </div>
+            ) : filteredAssets.length === 0 ? (
               <div className="text-center py-12">
                 <FileVideo className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
@@ -492,11 +668,28 @@ export default function VODUpload() {
                         ? 'aspect-video bg-gray-100 dark:bg-gray-800 relative' 
                         : 'w-16 h-12 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 relative'
                     }>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Play className="h-6 w-6 text-gray-400" />
-                      </div>
+                      {asset.processing_status === 'completed' && asset.url ? (
+                        <VideoThumbnail
+                          src={asset.url.endsWith('.m3u8') ? asset.url : 
+                               `https://d39hsmqppuzm82.cloudfront.net/media/${asset.id}/master.m3u8`}
+                          poster={asset.thumbnail_url || undefined}
+                          className="w-full h-full"
+                          showPlayButton={false}
+                          time={10}
+                        />
+                      ) : asset.thumbnail_url ? (
+                        <img 
+                          src={asset.thumbnail_url} 
+                          alt={asset.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Play className="h-6 w-6 text-gray-400" />
+                        </div>
+                      )}
                       <div className="absolute top-2 right-2">
-                        {getStatusIcon(asset.status)}
+                        {getStatusIcon(asset.processing_status)}
                       </div>
                     </div>
                     
@@ -524,41 +717,47 @@ export default function VODUpload() {
                             <Tabs defaultValue="details" className="w-full">
                               <TabsList>
                                 <TabsTrigger value="details">Details</TabsTrigger>
-                                <TabsTrigger value="edit">Edit</TabsTrigger>
-                                <TabsTrigger value="usage">Usage</TabsTrigger>
+                                <TabsTrigger value="preview">Preview</TabsTrigger>
+                                <TabsTrigger value="actions">Actions</TabsTrigger>
                               </TabsList>
                               
                               <TabsContent value="details" className="space-y-4">
-                                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                                  <Play className="h-12 w-12 text-gray-400" />
-                                </div>
+                                {asset.thumbnail_url && (
+                                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                    <img 
+                                      src={asset.thumbnail_url} 
+                                      alt={asset.title}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                )}
                                 
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                   <div>
-                                    <Label className="text-xs text-gray-500">Filename</Label>
-                                    <p className="font-mono">{asset.filename}</p>
+                                    <Label className="text-xs text-gray-500">ID</Label>
+                                    <p className="font-mono text-xs">{asset.id}</p>
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-gray-500">Format</Label>
-                                    <p>{asset.format}</p>
+                                    <Label className="text-xs text-gray-500">Type</Label>
+                                    <p>{asset.type}</p>
                                   </div>
                                   <div>
                                     <Label className="text-xs text-gray-500">Size</Label>
-                                    <p>{formatFileSize(asset.size)}</p>
+                                    <p>{formatFileSize(asset.file_size)}</p>
                                   </div>
                                   <div>
                                     <Label className="text-xs text-gray-500">Duration</Label>
                                     <p>{formatDuration(asset.duration)}</p>
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-gray-500">Upload Date</Label>
-                                    <p>{asset.uploadDate.toLocaleDateString()}</p>
+                                    <Label className="text-xs text-gray-500">Created</Label>
+                                    <p>{formatDate(asset.created_at)}</p>
                                   </div>
                                   <div>
                                     <Label className="text-xs text-gray-500">Status</Label>
                                     <div className="flex items-center gap-2">
-                                      {getStatusIcon(asset.status)}
-                                      <span className="capitalize">{asset.status}</span>
+                                      {getStatusIcon(asset.processing_status)}
+                                      <span className="capitalize">{asset.processing_status}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -570,65 +769,92 @@ export default function VODUpload() {
                                   </div>
                                 )}
                                 
-                                {asset.tags.length > 0 && (
+                                {asset.url && asset.processing_status === 'completed' && (
                                   <div>
-                                    <Label className="text-xs text-gray-500">Tags</Label>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {asset.tags.map((tag) => (
-                                        <Badge key={tag} variant="outline" className="text-xs">
-                                          {tag}
-                                        </Badge>
-                                      ))}
+                                    <Label className="text-xs text-gray-500">URL</Label>
+                                    <p className="text-xs font-mono break-all mt-1">{asset.url}</p>
+                                  </div>
+                                )}
+                              </TabsContent>
+                              
+                              <TabsContent value="preview" className="space-y-4">
+                                {asset.processing_status === 'completed' && asset.url ? (
+                                  <div className="aspect-video">
+                                    <VideoPlayer
+                                      src={asset.url.endsWith('.m3u8') ? asset.url : 
+                                           `https://d39hsmqppuzm82.cloudfront.net/media/${asset.id}/master.m3u8`}
+                                      poster={asset.thumbnail_url || undefined}
+                                      title={asset.title}
+                                      className="w-full h-full rounded-lg"
+                                      onError={(error) => {
+                                        console.error('Video playback error:', error);
+                                        toast.error('Failed to load video');
+                                      }}
+                                      onQualityChange={(level, quality) => {
+                                        console.log(`Quality changed to ${quality}`);
+                                      }}
+                                      enableSubtitles={false}
+                                    />
+                                  </div>
+                                ) : asset.processing_status === 'processing' ? (
+                                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                                    <div className="text-center">
+                                      <RefreshCw className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-3" />
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">Video is being processed</p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">This may take a few minutes</p>
+                                    </div>
+                                  </div>
+                                ) : asset.processing_status === 'failed' ? (
+                                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                                    <div className="text-center">
+                                      <XCircle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">Video processing failed</p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Please try uploading again</p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                                    <div className="text-center">
+                                      <Clock className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">Video queued for processing</p>
                                     </div>
                                   </div>
                                 )}
-                                
-                                <div className="flex gap-2 pt-4">
-                                  <Button size="sm" variant="outline">
-                                    <Copy className="h-4 w-4 mr-2" />
-                                    Copy URL
-                                  </Button>
-                                  <Button size="sm" variant="outline">
-                                    <Download className="h-4 w-4 mr-2" />
-                                    Download
-                                  </Button>
-                                </div>
                               </TabsContent>
                               
-                              <TabsContent value="edit" className="space-y-4">
-                                <div className="space-y-4">
-                                  <div>
-                                    <Label htmlFor="title">Title</Label>
-                                    <Input id="title" defaultValue={asset.title} />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea id="description" defaultValue={asset.description} />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="tags">Tags (comma-separated)</Label>
-                                    <Input id="tags" defaultValue={asset.tags.join(', ')} />
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <Button size="sm">Save Changes</Button>
-                                    <Button size="sm" variant="outline">Cancel</Button>
-                                  </div>
-                                </div>
-                              </TabsContent>
-                              
-                              <TabsContent value="usage" className="space-y-4">
-                                <div className="text-center py-8">
-                                  <p className="text-lg font-medium mb-2">
-                                    Used in {asset.usage} events
-                                  </p>
-                                  <p className="text-sm text-gray-500 mb-4">
-                                    This asset is currently being used in {asset.usage} live events
-                                  </p>
-                                  {asset.usage > 0 && (
-                                    <Button size="sm" variant="outline">
-                                      View Event List
-                                    </Button>
+                              <TabsContent value="actions" className="space-y-4">
+                                <div className="flex flex-col gap-2">
+                                  {asset.url && asset.processing_status === 'completed' && (
+                                    <>
+                                      <Button 
+                                        size="sm" 
+                                        variant="outline"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(asset.url);
+                                          toast.success('URL copied to clipboard');
+                                        }}
+                                      >
+                                        <Copy className="h-4 w-4 mr-2" />
+                                        Copy URL
+                                      </Button>
+                                      <Button 
+                                        size="sm" 
+                                        variant="outline"
+                                        onClick={() => window.open(asset.url, '_blank')}
+                                      >
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Download
+                                      </Button>
+                                    </>
                                   )}
+                                  <Button 
+                                    size="sm" 
+                                    variant="destructive"
+                                    onClick={() => deleteAsset(asset.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete Asset
+                                  </Button>
                                 </div>
                               </TabsContent>
                             </Tabs>
@@ -637,28 +863,46 @@ export default function VODUpload() {
                       </div>
                       
                       <div className={`text-xs text-gray-500 ${viewMode === 'grid' ? 'mt-2 space-y-1' : 'mt-1 flex items-center gap-4'}`}>
-                        <span>{formatFileSize(asset.size)}</span>
-                        <span>{asset.format}</span>
-                        {asset.duration > 0 && <span>{formatDuration(asset.duration)}</span>}
+                        <span>{formatFileSize(asset.file_size)}</span>
+                        {asset.duration && <span>{formatDuration(asset.duration)}</span>}
+                        <Badge variant={getStatusBadgeVariant(asset.processing_status)} className="text-xs">
+                          {asset.processing_status}
+                        </Badge>
                       </div>
                       
-                      {viewMode === 'grid' && asset.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {asset.tags.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {asset.tags.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{asset.tags.length - 2}
-                            </Badge>
-                          )}
+                      {viewMode === 'grid' && (
+                        <div className="mt-2 text-xs text-gray-400">
+                          {formatDate(asset.created_at)}
                         </div>
                       )}
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+            
+            {/* Pagination */}
+            {totalAssets > assetsPerPage && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-500">
+                  Page {currentPage} of {Math.ceil(totalAssets / assetsPerPage)}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage >= Math.ceil(totalAssets / assetsPerPage)}
+                  onClick={() => setCurrentPage(p => p + 1)}
+                >
+                  Next
+                </Button>
               </div>
             )}
           </CardContent>

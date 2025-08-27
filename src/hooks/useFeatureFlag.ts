@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/services/api';
+import api from '@/services/api';
 import { useWebSocket } from '@/hooks/useWebSocket';
 
 // Types
@@ -73,8 +73,8 @@ export function useFeatureFlag(
   // Build evaluation context
   const evaluationContext = useMemo(() => ({
     userId: user?.id,
-    tenantId: tenant?.id || context?.tenantId,
-    tenantTier: tenant?.subscription_tier || context?.tenantTier,
+    tenantId: tenant || context?.tenantId,
+    tenantTier: user?.tenantId ? 'basic' : context?.tenantTier, // TODO: Get actual tier from API
     region: context?.region,
     ...context?.customAttributes,
   }), [user, tenant, context]);
@@ -147,10 +147,12 @@ export function useFeatureFlag(
     // Subscribe to flag updates
     const subscriptionKey = `feature_flag:${flagKey}`;
     
+    let unsubscribeFn: (() => void) | undefined;
+    
     if (!wsSubscriptions.has(subscriptionKey)) {
       wsSubscriptions.add(subscriptionKey);
       
-      subscribe('feature_flag_update', (data: any) => {
+      const handleUpdate = (data: any) => {
         if (data.flag_key === flagKey) {
           // Invalidate cache
           flagCache.delete(flagKey);
@@ -159,12 +161,16 @@ export function useFeatureFlag(
           // Re-evaluate
           evaluateFlag(true);
         }
-      });
+      };
+      
+      unsubscribeFn = subscribe('feature_flag_update', handleUpdate);
     }
 
     return () => {
       wsSubscriptions.delete(subscriptionKey);
-      unsubscribe('feature_flag_update');
+      if (unsubscribeFn) {
+        unsubscribeFn();
+      }
     };
   }, [flagKey, subscribe, unsubscribe, evaluateFlag]);
 
@@ -215,8 +221,8 @@ export function useFeatureFlags(
   // Build evaluation context
   const evaluationContext = useMemo(() => ({
     userId: user?.id,
-    tenantId: tenant?.id || context?.tenantId,
-    tenantTier: tenant?.subscription_tier || context?.tenantTier,
+    tenantId: tenant || context?.tenantId,
+    tenantTier: user?.tenantId ? 'basic' : context?.tenantTier, // TODO: Get actual tier from API
     region: context?.region,
     ...context?.customAttributes,
   }), [user, tenant, context]);
@@ -298,10 +304,10 @@ export function useFeatureFlags(
       }
     };
 
-    subscribe('feature_flag_update', handleUpdate);
+    const unsubscribeFn = subscribe('feature_flag_update', handleUpdate);
 
     return () => {
-      unsubscribe('feature_flag_update');
+      unsubscribeFn();
     };
   }, [flagKeys, subscribe, unsubscribe, evaluateFlags]);
 
@@ -339,7 +345,7 @@ export function useTenantFeatureFlags(): {
   const [error, setError] = useState<Error | undefined>();
 
   const fetchFlags = useCallback(async () => {
-    if (!tenant?.id) {
+    if (!tenant) {
       setLoading(false);
       return;
     }
@@ -348,7 +354,7 @@ export function useTenantFeatureFlags(): {
       setLoading(true);
       setError(undefined);
 
-      const response = await api.get(`/api/feature-flags/tenant/${tenant.id}`);
+      const response = await api.get(`/api/feature-flags/tenant/${tenant}`);
       setFlags(response.data);
       
       // Cache all flags

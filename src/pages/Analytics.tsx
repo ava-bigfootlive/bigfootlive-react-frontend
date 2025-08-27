@@ -58,7 +58,8 @@ export default function AnalyticsPage() {
     error,
   } = useAnalytics();
 
-  const { isConnected } = useWebSocket();
+  // Use WebSocket with silent mode and no auto-connect
+  const { isConnected } = useWebSocket({ autoConnect: false, silent: true });
   const { acknowledgeAlert } = useAnalyticsAlerts();
   const { generateReport, downloadUrl, isGenerating } = useAnalyticsExport();
 

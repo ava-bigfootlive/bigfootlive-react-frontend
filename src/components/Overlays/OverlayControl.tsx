@@ -28,7 +28,7 @@ import {
   Timer
 } from 'lucide-react';
 
-interface OverlayTemplate {
+export interface OverlayTemplate {
   id: string;
   name: string;
   overlay_type: string;
@@ -36,7 +36,7 @@ interface OverlayTemplate {
   usage_count: number;
 }
 
-interface OverlayContent {
+export interface OverlayContent {
   id: string;
   template_id: string;
   title?: string;
@@ -48,7 +48,7 @@ interface OverlayContent {
   template?: OverlayTemplate;
 }
 
-interface OverlayQueueItem {
+export interface OverlayQueueItem {
   id: string;
   content_id: string;
   status: 'pending' | 'active' | 'completed' | 'cancelled';
@@ -59,7 +59,7 @@ interface OverlayQueueItem {
   content?: OverlayContent;
 }
 
-interface OverlayPreset {
+export interface OverlayPreset {
   id: string;
   name: string;
   description?: string;
@@ -106,7 +106,7 @@ export const OverlayControl: React.FC<OverlayControlProps> = ({
   // WebSocket connection for real-time updates
   useEffect(() => {
     const connectWebSocket = () => {
-      const ws = new WebSocket(`ws://localhost:8000/api/v1/overlays/events/${eventId}/ws`);
+      const ws = new WebSocket(`wss://api.bigfootlive.io/api/v1/overlays/events/${eventId}/ws`);
       
       ws.onopen = () => {
         setIsConnected(true);
@@ -409,7 +409,6 @@ export const OverlayControl: React.FC<OverlayControlProps> = ({
                             <div className="space-y-2 mb-3">
                               <Input
                                 placeholder="Speaker Name"
-                                size="sm"
                                 value={quickContent[template.id]?.name || ''}
                                 onChange={(e) => setQuickContent(prev => ({
                                   ...prev,
@@ -421,7 +420,6 @@ export const OverlayControl: React.FC<OverlayControlProps> = ({
                               />
                               <Input
                                 placeholder="Speaker Title"
-                                size="sm"
                                 value={quickContent[template.id]?.title || ''}
                                 onChange={(e) => setQuickContent(prev => ({
                                   ...prev,
@@ -505,16 +503,14 @@ export const OverlayControl: React.FC<OverlayControlProps> = ({
                               <div className="flex gap-1">
                                 {item.status === 'pending' && (
                                   <Button
-                                    size="sm"
-                                    variant="outline"
+                                        variant="outline"
                                     onClick={() => triggerOverlay(item.id)}
                                   >
                                     <Play className="w-4 h-4" />
                                   </Button>
                                 )}
                                 <Button
-                                  size="sm"
-                                  variant="outline"
+                                    variant="outline"
                                   onClick={() => removeFromQueue(item.id)}
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -555,8 +551,7 @@ export const OverlayControl: React.FC<OverlayControlProps> = ({
                                 </div>
                                 <div className="flex gap-1">
                                   <Button
-                                    size="sm"
-                                    variant="outline"
+                                        variant="outline"
                                     onClick={() => addContentToQueue(content.id)}
                                   >
                                     <Plus className="w-4 h-4" />
