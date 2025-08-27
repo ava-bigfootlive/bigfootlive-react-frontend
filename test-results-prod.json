@@ -1,0 +1,513 @@
+{
+  "config": {
+    "configFile": "/home/ava-io/repos/bigfootlive-react-frontend/playwright.prod.config.ts",
+    "rootDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e",
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report-prod",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results-prod.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "junit-prod.xml"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/ava-io/repos/bigfootlive-react-frontend/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-prod",
+        "name": "chromium-prod",
+        "testDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "00-production-health.spec.ts",
+      "file": "00-production-health.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Production Health Check",
+          "file": "00-production-health.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Frontend should be accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 742,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:07.213Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-2f057b5a93d462b2ec0b",
+              "file": "00-production-health.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "API should be healthy",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 158,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:08.006Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-a66cc1ff23808f5deea3",
+              "file": "00-production-health.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Login page should load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 662,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:08.175Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-9c7d1767529ad2a304a2",
+              "file": "00-production-health.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "Feature flags endpoint should respond",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 31,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:08.844Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-4db2394e6d1d2313268c",
+              "file": "00-production-health.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "WebSocket connection should be available",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 504,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:08.879Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-70a464a0127b198cae71",
+              "file": "00-production-health.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "CloudFront CDN should serve assets",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 122,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:09.388Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-ed0c64a7d0a6d9cb0f71",
+              "file": "00-production-health.spec.ts",
+              "line": 50,
+              "column": 3
+            },
+            {
+              "title": "Dashboard redirects when not authenticated",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 600,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:09.515Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-f19e03b0620a4377a7a8",
+              "file": "00-production-health.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "Platform Admin requires authentication",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 597,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:10.120Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-ab876dc7c247a6ceece5",
+              "file": "00-production-health.spec.ts",
+              "line": 71,
+              "column": 3
+            },
+            {
+              "title": "Events page requires authentication",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 559,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:10.722Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-89c5d859252459de4f8c",
+              "file": "00-production-health.spec.ts",
+              "line": 80,
+              "column": 3
+            },
+            {
+              "title": "API CORS headers configured correctly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-prod",
+                  "projectName": "chromium-prod",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 33,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m\n    at /home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts:94:94",
+                        "location": {
+                          "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                          "column": 94,
+                          "line": 94
+                        },
+                        "snippet": "  92 |     \n  93 |     // Check for CORS headers\n> 94 |     expect(headers['access-control-allow-origin'] || headers['Access-Control-Allow-Origin']).toBeTruthy();\n     |                                                                                              ^\n  95 |   });\n  96 | });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                            "column": 94,
+                            "line": 94
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m\n\n  92 |     \n  93 |     // Check for CORS headers\n> 94 |     expect(headers['access-control-allow-origin'] || headers['Access-Control-Allow-Origin']).toBeTruthy();\n     |                                                                                              ^\n  95 |   });\n  96 | });\n    at /home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts:94:94"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-27T06:20:11.287Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ava-io/repos/bigfootlive-react-frontend/test-results/00-production-health-Produ-355fb-eaders-configured-correctly-chromium-prod/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                        "column": 94,
+                        "line": 94
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 147,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m\n    at /home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts:94:94",
+                        "location": {
+                          "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                          "column": 94,
+                          "line": 94
+                        },
+                        "snippet": "  92 |     \n  93 |     // Check for CORS headers\n> 94 |     expect(headers['access-control-allow-origin'] || headers['Access-Control-Allow-Origin']).toBeTruthy();\n     |                                                                                              ^\n  95 |   });\n  96 | });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                            "column": 94,
+                            "line": 94
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mundefined\u001b[39m\n\n  92 |     \n  93 |     // Check for CORS headers\n> 94 |     expect(headers['access-control-allow-origin'] || headers['Access-Control-Allow-Origin']).toBeTruthy();\n     |                                                                                              ^\n  95 |   });\n  96 | });\n    at /home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts:94:94"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-27T06:20:11.656Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ava-io/repos/bigfootlive-react-frontend/test-results/00-production-health-Produ-355fb-eaders-configured-correctly-chromium-prod-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ava-io/repos/bigfootlive-react-frontend/tests/e2e/00-production-health.spec.ts",
+                        "column": 94,
+                        "line": 94
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "512bb31430e61d2ce186-c2c4faab00fdd8afc514",
+              "file": "00-production-health.spec.ts",
+              "line": 89,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-27T06:20:06.877Z",
+    "duration": 4959.1359999999995,
+    "expected": 9,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

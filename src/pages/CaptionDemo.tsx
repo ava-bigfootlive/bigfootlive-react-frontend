@@ -567,7 +567,7 @@ const CaptionDemo: React.FC = () => {
                 <h4 className="font-medium mb-2">Caption Quality Standards</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• 99%+ accuracy for live captions</li>
-                  <li>• <3 second latency</li>
+                  <li>• &lt;3 second latency</li>
                   <li>• Proper punctuation and formatting</li>
                   <li>• Speaker identification support</li>
                 </ul>

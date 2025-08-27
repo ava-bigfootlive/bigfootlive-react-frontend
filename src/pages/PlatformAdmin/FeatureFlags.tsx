@@ -72,7 +72,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { api } from '@/services/api';
+import api from '@/services/api';
 
 // Types
 interface FeatureFlag {
@@ -937,3 +937,5 @@ export function FeatureFlags() {
     </div>
   );
 }
+
+export default FeatureFlags;

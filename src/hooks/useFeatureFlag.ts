@@ -471,11 +471,11 @@ export function withFeatureFlag<P extends object>(
     }
     
     if (isEnabled) {
-      return <Component {...props} />;
+      return React.createElement(Component, props);
     }
     
     if (FallbackComponent) {
-      return <FallbackComponent {...props} />;
+      return React.createElement(FallbackComponent, props);
     }
     
     return null;

@@ -13,9 +13,11 @@ import {
   BarChart3,
   ArrowLeft,
   Server,
-  Bell
+  Bell,
+  Flag
 } from 'lucide-react';
 import api from '../services/api';
+import FeatureFlags from './PlatformAdmin/FeatureFlags';
 
 interface PlatformStats {
   totalTenants: number;
@@ -40,7 +42,7 @@ export default function PlatformAdminPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'tenants' | 'users' | 'billing' | 'system'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tenants' | 'users' | 'billing' | 'system' | 'features'>('overview');
 
   useEffect(() => {
     fetchPlatformStats();
@@ -100,6 +102,7 @@ export default function PlatformAdminPage() {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'tenants', label: 'Tenants', icon: Building2 },
     { id: 'users', label: 'Users', icon: Users },
+    { id: 'features', label: 'Feature Flags', icon: Flag },
     { id: 'billing', label: 'Billing', icon: DollarSign },
     { id: 'system', label: 'System', icon: Server }
   ];
@@ -308,6 +311,11 @@ export default function PlatformAdminPage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Feature Flags Tab */}
+        {activeTab === 'features' && (
+          <FeatureFlags />
         )}
 
         {/* Billing Tab */}
