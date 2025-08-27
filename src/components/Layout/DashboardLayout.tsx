@@ -67,7 +67,7 @@ export function DashboardLayout({ children, title, subtitle, actions }: Dashboar
           backgroundColor: 'hsl(var(--background))',
           minHeight: 'calc(100vh - 80px)'
         }}>
-          <div className="max-w-7xl mx-auto">
+          <div className="mx-auto" style={{ maxWidth: '80rem' }}>
             {children}
           </div>
         </main>
