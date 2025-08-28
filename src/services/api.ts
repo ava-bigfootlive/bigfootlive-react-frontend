@@ -277,36 +277,6 @@ class ApiClient {
       if (endpoint.match(/\/events\/[^/]+$/)) {
         return null;
       }
-      // In development mode, return demo events for testing
-      if (import.meta.env.VITE_APP_ENV === 'development') {
-        return [
-          {
-            id: 'demo-event-1',
-            title: 'Test Streaming Event',
-            name: 'Test Streaming Event',
-            description: 'A test event for local streaming',
-            start_time: new Date().toISOString(),
-            status: 'scheduled',
-            is_private: false,
-            stream_key: 'test123',
-            rtmp_url: import.meta.env.VITE_RTMP_URL || 'rtmp://localhost:1935/live',
-            hls_url: `${import.meta.env.VITE_HLS_BASE_URL || 'http://localhost:8080/hls'}/test123/index.m3u8`
-          },
-          {
-            id: 'demo-event-2',
-            title: 'Live Demo Stream',
-            name: 'Live Demo Stream',
-            description: 'Currently streaming demo',
-            start_time: new Date(Date.now() - 3600000).toISOString(),
-            status: 'live',
-            is_private: false,
-            viewer_count: 42,
-            stream_key: 'demo-live',
-            rtmp_url: import.meta.env.VITE_RTMP_URL || 'rtmp://localhost:1935/live',
-            hls_url: `${import.meta.env.VITE_HLS_BASE_URL || 'http://localhost:8080/hls'}/demo-live/index.m3u8`
-          }
-        ];
-      }
       return [];
     }
     

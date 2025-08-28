@@ -28,6 +28,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { apiClient } from '../services/api';
+import mediaService from '../services/mediaService';
 import { toast } from 'sonner';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoThumbnail } from '@/components/VideoPlayer';
@@ -46,16 +47,17 @@ interface UploadFile {
 interface MediaAsset {
   id: string;
   title: string;
-  description: string | null;
+  description?: string | null;
   type: string;
   url: string;
-  thumbnail_url: string | null;
-  processing_status: 'queued' | 'processing' | 'completed' | 'failed';
+  thumbnail_url?: string | null;
+  processing_status: string;
   file_size: number;
-  duration: number | null;
+  duration?: number | null;
   created_at: string;
   updated_at?: string;
   metadata?: any;
+  hls_url?: string;
 }
 
 const ALLOWED_FORMATS = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
@@ -99,7 +101,7 @@ export default function VODUpload() {
     if (showLoading) setIsLoading(true);
     
     try {
-      const response = await apiClient.getUserMedia(currentPage, assetsPerPage);
+      const response = await mediaService.getUserMedia((currentPage - 1) * assetsPerPage, assetsPerPage);
       setAssets(response.items || []);
       setTotalAssets(response.total || 0);
     } catch (error: any) {
@@ -169,42 +171,19 @@ export default function VODUpload() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       handleFiles(e.target.files);
+      // Reset the input value to allow selecting the same file again
+      e.target.value = '';
     }
   };
 
   // Upload file to S3
   const uploadToS3 = async (uploadFile: UploadFile): Promise<{ objectKey: string; mediaId: string } | null> => {
     try {
-      // Get presigned URL
-      const presignedResponse = await apiClient.getUploadUrl(
+      // Get presigned URL from media service
+      const presignedResponse = await mediaService.getPresignedUrl(
         uploadFile.file.name,
         uploadFile.file.type || 'video/mp4'
-      ).catch(() => {
-        // In demo mode, simulate successful upload
-        console.log('Demo mode: Simulating upload success');
-        return {
-          url: 'https://demo.bigfootlive.io/upload',
-          object_key: `demo-upload-${Date.now()}`,
-          fields: {}
-        };
-      });
-
-      // In demo mode, simulate upload progress and success
-      if (presignedResponse.url.includes('demo')) {
-        // Simulate upload progress
-        for (let progress = 0; progress <= 100; progress += 10) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          setUploadFiles(prev => prev.map(f => 
-            f.id === uploadFile.id ? { ...f, progress } : f
-          ));
-        }
-        
-        // Return demo success
-        return {
-          objectKey: presignedResponse.object_key || `demo-${Date.now()}`,
-          mediaId: `media-${Date.now()}`
-        };
-      }
+      );
 
       // Create FormData with the fields from presigned URL
       const formData = new FormData();
@@ -235,10 +214,11 @@ export default function VODUpload() {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               // Mark upload complete in backend
-              const completeResponse = await apiClient.completeUpload(
+              const completeResponse = await mediaService.completeUpload(
                 presignedResponse.object_key,
                 uploadFile.file.name,
-                uploadFile.file.size
+                undefined,
+                undefined
               );
               
               resolve({
@@ -261,7 +241,7 @@ export default function VODUpload() {
           reject(new Error('Upload cancelled'));
         });
 
-        xhr.open('POST', presignedResponse.upload_url || presignedResponse.url);
+        xhr.open('POST', presignedResponse.upload_url);
         xhr.send(formData);
       });
     } catch (error) {

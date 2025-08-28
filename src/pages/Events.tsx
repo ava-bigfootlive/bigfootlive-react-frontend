@@ -79,27 +79,38 @@ import {
   Info,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import api from '../services/api';
+import eventService, { LiveEvent } from '../services/eventService';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 
 // Event interface matching backend structure
+// Event interface for UI - compatible with LiveEvent but more flexible
 export interface Event {
   id: string;
   title: string;
   description?: string;
-  start_time: string;
-  end_time?: string;
-  status: 'scheduled' | 'live' | 'completed' | 'cancelled' | 'draft';
+  status: 'scheduled' | 'live' | 'completed' | 'cancelled' | 'draft' | 'ended';
   stream_key?: string;
   rtmp_url?: string;
+  rtmps_url?: string;
+  hls_url?: string;
+  container_id?: string;
+  scheduled_start?: string;
+  actual_start?: string;
+  actual_end?: string;
   viewer_count?: number;
-  is_private: boolean;
-  thumbnail_url?: string;
+  max_viewers?: number;
+  recording_enabled?: boolean;
+  chat_enabled?: boolean;
   created_at?: string;
   updated_at?: string;
+  metadata?: any;
+  // UI-specific fields
+  start_time?: string;
+  end_time?: string;
+  is_private?: boolean;
+  thumbnail_url?: string;
   // Additional fields for UI enhancement
-  max_viewers?: number;
   total_views?: number;
   category?: string;
   tags?: string[];
@@ -165,10 +176,10 @@ export function EventsPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.getEvents();
+      const response = await eventService.listEvents();
       
-      // Handle both array response and object with data property
-      const eventsData = Array.isArray(response) ? response : (response.data || response.events || []);
+      // Handle the items/total response structure from eventService
+      const eventsData = response.items || [];
       
       // Ensure all events have required fields
       const normalizedEvents = eventsData.map((event: any) => ({
@@ -290,7 +301,7 @@ export function EventsPage() {
     
     try {
       if (dialogMode === 'create') {
-        const response = await api.createEvent(eventForm);
+        const response = await eventService.createEvent(eventForm);
         if (response) {
           setEvents(prev => [response, ...prev]);
           toast({
@@ -299,7 +310,7 @@ export function EventsPage() {
           });
         }
       } else if (dialogMode === 'edit' && selectedEvent) {
-        const response = await api.updateEvent(selectedEvent.id, eventForm);
+        const response = await eventService.updateEvent(selectedEvent.id, eventForm);
         if (response) {
           setEvents(prev => prev.map(e => e.id === selectedEvent.id ? response : e));
           toast({
@@ -340,7 +351,7 @@ export function EventsPage() {
     if (!eventToDelete) return;
 
     try {
-      await api.deleteEvent(eventToDelete.id);
+      await eventService.deleteEvent(eventToDelete.id);
       setEvents(prev => prev.filter(e => e.id !== eventToDelete.id));
       toast({
         title: 'Success',
@@ -375,7 +386,7 @@ export function EventsPage() {
         tags: event.tags,
       };
       
-      const newEvent = await api.createEvent(duplicatedData);
+      const newEvent = await eventService.createEvent(duplicatedData);
       if (newEvent) {
         setEvents(prev => [newEvent, ...prev]);
         toast({
@@ -429,7 +440,7 @@ export function EventsPage() {
   // Handle start stream
   const handleStartStream = async (event: Event) => {
     try {
-      await api.startStream(event.id);
+      await eventService.startEvent(event.id);
       
       // Update local state
       setEvents(prev => prev.map(e => 
@@ -480,7 +491,7 @@ export function EventsPage() {
   // Handle stop stream
   const handleStopStream = async (event: Event) => {
     try {
-      await api.stopStream(event.id);
+      await eventService.stopEvent(event.id);
       
       // Update local state
       setEvents(prev => prev.map(e => 
@@ -564,7 +575,7 @@ export function EventsPage() {
 
     try {
       await Promise.all(
-        selectedRows.map(row => api.deleteEvent(row.original.id))
+        selectedRows.map(row => eventService.deleteEvent(row.original.id))
       );
       
       const deletedIds = selectedRows.map(row => row.original.id);

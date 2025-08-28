@@ -7,7 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { errorHandler } from './utils/errorHandler';
 import { networkMonitor } from './utils/networkMonitor';
 
-// Pages
+// Existing Pages
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
@@ -28,6 +28,39 @@ import { EventsPage } from './pages/Events';
 import LandingPage from './pages/Landing';
 import MediaAssetsPage from './pages/MediaAssets';
 import VideoPlayerTestPage from './pages/VideoPlayerTest';
+import SAMLConfigurationPage from './pages/SAMLConfiguration';
+import AdminDashboardPage from './pages/AdminDashboard';
+import EventManagementPage from './pages/EventManagement';
+import PlaylistManagerPage from './pages/PlaylistManager';
+import EmbedGeneratorPage from './pages/EmbedGenerator';
+
+// Streaming Pages
+import WebRTCStreaming from './pages/streaming/WebRTCStreaming';
+import RTMPConfiguration from './pages/streaming/RTMPConfiguration';
+import HLSAdaptiveBitrate from './pages/streaming/HLSAdaptiveBitrate';
+import StreamHealthMonitor from './pages/streaming/StreamHealthMonitor';
+
+// Enhanced Dashboard Home Page
+import StreamManager from './pages/Streaming/StreamManager';
+import VODLibrary from './pages/CMS/VODLibrary';
+import AssetManager from './pages/CMS/AssetManager';
+import ContentScheduler from './pages/CMS/ContentScheduler';
+import AnalyticsDashboard from './pages/Analytics/AnalyticsDashboard';
+import SubscriptionManager from './pages/Monetization/SubscriptionManager';
+import PayPerView from './pages/Monetization/PayPerView';
+import RevenueAnalytics from './pages/Monetization/RevenueAnalytics';
+import EnhancedVideoPlayer from './components/VideoPlayer/EnhancedVideoPlayer';
+import LiveChat from './components/Interactive/LiveChat';
+import ReactionsOverlay from './components/Interactive/ReactionsOverlay';
+import QASystem from './components/Interactive/QASystem';
+import VirtualGifts from './components/Interactive/VirtualGifts';
+import NotificationCenter from './pages/Notifications/NotificationCenter';
+import MicrositesBuilder from './pages/Microsites/MicrositesBuilder';
+import WhiteLabelConfig from './pages/WhiteLabel/WhiteLabelConfig';
+import IntegrationsHub from './pages/Integrations/IntegrationsHub';
+import UserManagement from './pages/Users/UserManagement';
+import Settings from './pages/Settings/Settings';
+import HelpCenter from './pages/Help/HelpCenter';
 
 function App() {
   // Initialize theme on app load
@@ -112,7 +145,16 @@ function App() {
             path="/vod-upload"
             element={
               <ProtectedRoute>
-                <VODUploadPage />
+                <MediaAssetsPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/media-assets"
+            element={
+              <ProtectedRoute>
+                <MediaAssetsPage />
               </ProtectedRoute>
             }
           />
@@ -233,6 +275,230 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <PlatformAdminPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Admin Dashboard */}
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* SAML Configuration */}
+          <Route
+            path="/saml-config"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <SAMLConfigurationPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Event Management */}
+          <Route
+            path="/event-management"
+            element={
+              <ProtectedRoute>
+                <EventManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Playlist Manager */}
+          <Route
+            path="/playlists"
+            element={
+              <ProtectedRoute>
+                <PlaylistManagerPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Embed Generator */}
+          <Route
+            path="/embed-generator"
+            element={
+              <ProtectedRoute>
+                <EmbedGeneratorPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Streaming Routes */}
+          <Route
+            path="/streaming/webrtc"
+            element={
+              <ProtectedRoute>
+                <WebRTCStreaming />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/streaming/rtmp"
+            element={
+              <ProtectedRoute>
+                <RTMPConfiguration />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/streaming/hls"
+            element={
+              <ProtectedRoute>
+                <HLSAdaptiveBitrate />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/streaming/health"
+            element={
+              <ProtectedRoute>
+                <StreamHealthMonitor />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Comprehensive Routes - New Platform Features */}
+
+          <Route
+            path="/stream-manager"
+            element={
+              <ProtectedRoute>
+                <StreamManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/vod-library"
+            element={
+              <ProtectedRoute>
+                <VODLibrary />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/asset-manager"
+            element={
+              <ProtectedRoute>
+                <AssetManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/content-scheduler"
+            element={
+              <ProtectedRoute>
+                <ContentScheduler />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/analytics-dashboard"
+            element={
+              <ProtectedRoute>
+                <AnalyticsDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/subscription-manager"
+            element={
+              <ProtectedRoute>
+                <SubscriptionManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pay-per-view"
+            element={
+              <ProtectedRoute>
+                <PayPerView />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/revenue-analytics"
+            element={
+              <ProtectedRoute>
+                <RevenueAnalytics />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationCenter />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/microsites"
+            element={
+              <ProtectedRoute>
+                <MicrositesBuilder />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/white-label"
+            element={
+              <ProtectedRoute>
+                <WhiteLabelConfig />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/integrations"
+            element={
+              <ProtectedRoute>
+                <IntegrationsHub />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user-management"
+            element={
+              <ProtectedRoute>
+                <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/help"
+            element={
+              <ProtectedRoute>
+                <HelpCenter />
               </ProtectedRoute>
             }
           />
