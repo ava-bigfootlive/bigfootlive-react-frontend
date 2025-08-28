@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -258,18 +259,17 @@ export const AssetManager: React.FC = () => {
   const storagePercentage = (storageUsed / storageLimit) * 100;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Asset Manager</h1>
-          <p className="text-muted-foreground">Manage all your media assets and files</p>
-        </div>
+    <DashboardLayout
+      title="Asset Manager"
+      subtitle="Manage all your media assets and files"
+      actions={
         <Button onClick={() => setShowUploadDialog(true)}>
           <Upload className="h-4 w-4 mr-2" />
           Upload Assets
         </Button>
-      </div>
+      }
+    >
+      <div className="space-y-6">
 
       {/* Storage Overview */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -762,6 +762,7 @@ export const AssetManager: React.FC = () => {
         </Dialog>
       )}
     </div>
+    </DashboardLayout>
   );
 };
 

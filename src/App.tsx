@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { ProtectedRoute } from './components/Layout/ProtectedRoute';
 import { Toaster } from './components/ui/toaster';
 import { useEffect } from 'react';
@@ -63,19 +64,6 @@ import Settings from './pages/Settings/Settings';
 import HelpCenter from './pages/Help/HelpCenter';
 
 function App() {
-  // Initialize theme on app load
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-    
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
   // Setup global error handlers
   useEffect(() => {
     // Handle unhandled promise rejections
@@ -118,9 +106,10 @@ function App() {
   }, []);
   return (
     <ErrorBoundary>
-      <Router>
-        <AuthProvider>
-          <Routes>
+      <ThemeProvider>
+        <Router>
+          <AuthProvider>
+            <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -509,6 +498,7 @@ function App() {
         <Toaster />
       </AuthProvider>
     </Router>
+    </ThemeProvider>
   </ErrorBoundary>
   );
 }

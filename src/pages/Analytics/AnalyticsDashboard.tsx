@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -91,143 +92,79 @@ interface ViewerSession {
 export const AnalyticsDashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('24h');
   const [selectedMetric, setSelectedMetric] = useState('viewers');
-  const [isLive, setIsLive] = useState(true);
-  const [currentViewers, setCurrentViewers] = useState(1234);
-  
-  // Simulate real-time updates
-  useEffect(() => {
-    if (!isLive) return;
-    
-    const interval = setInterval(() => {
-      setCurrentViewers(prev => {
-        const change = Math.floor(Math.random() * 20) - 10;
-        return Math.max(0, prev + change);
-      });
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [isLive]);
+  const [isLive] = useState(false);
+  const [currentViewers] = useState(0);
 
-  // Real-time metrics
+  // Real-time metrics - empty state
   const realtimeMetrics: RealtimeMetric[] = [
     {
       id: 'viewers',
       label: 'Current Viewers',
       value: currentViewers,
-      change: 12.5,
+      change: 0,
       icon: Users,
       color: 'text-blue-500'
     },
     {
       id: 'engagement',
       label: 'Engagement Rate',
-      value: 68.3,
+      value: 0,
       unit: '%',
-      change: 5.2,
+      change: 0,
       icon: Activity,
       color: 'text-green-500'
     },
     {
       id: 'watchtime',
       label: 'Avg. Watch Time',
-      value: 24,
+      value: 0,
       unit: 'min',
-      change: -2.1,
+      change: 0,
       icon: Clock,
       color: 'text-purple-500'
     },
     {
       id: 'bandwidth',
       label: 'Bandwidth Usage',
-      value: 847,
+      value: 0,
       unit: 'Mbps',
-      change: 8.7,
+      change: 0,
       icon: Wifi,
       color: 'text-orange-500'
     }
   ];
 
-  // Sample data for charts
+  // Empty data for charts - no mock data
   const viewerData = Array.from({ length: 24 }, (_, i) => ({
     time: `${i}:00`,
-    viewers: Math.floor(Math.random() * 2000) + 500,
-    engagement: Math.floor(Math.random() * 100),
-    bandwidth: Math.floor(Math.random() * 1000) + 200
+    viewers: 0,
+    engagement: 0,
+    bandwidth: 0
   }));
 
   const deviceData = [
-    { name: 'Desktop', value: 45, color: '#8b5cf6' },
-    { name: 'Mobile', value: 35, color: '#3b82f6' },
-    { name: 'Tablet', value: 15, color: '#10b981' },
-    { name: 'Smart TV', value: 5, color: '#f59e0b' }
+    { name: 'Desktop', value: 0, color: '#8b5cf6' },
+    { name: 'Mobile', value: 0, color: '#3b82f6' },
+    { name: 'Tablet', value: 0, color: '#10b981' },
+    { name: 'Smart TV', value: 0, color: '#f59e0b' }
   ];
 
-  const geographicData = [
-    { country: 'United States', viewers: 4500, percentage: 35 },
-    { country: 'United Kingdom', viewers: 2100, percentage: 16 },
-    { country: 'Canada', viewers: 1800, percentage: 14 },
-    { country: 'Australia', viewers: 1200, percentage: 9 },
-    { country: 'Germany', viewers: 950, percentage: 7 },
-    { country: 'France', viewers: 800, percentage: 6 },
-    { country: 'Others', viewers: 1650, percentage: 13 }
-  ];
+  const geographicData: any[] = [];
 
-  const qualityDistribution = [
-    { quality: '1080p', viewers: 3500, percentage: 45 },
-    { quality: '720p', viewers: 2700, percentage: 35 },
-    { quality: '480p', viewers: 1100, percentage: 14 },
-    { quality: '360p', viewers: 470, percentage: 6 }
-  ];
+  const qualityDistribution: any[] = [];
 
-  const contentPerformance = [
-    { name: 'Championship Finals', views: 125000, engagement: 85, retention: 72 },
-    { name: 'Weekly Q&A Session', views: 45000, engagement: 92, retention: 68 },
-    { name: 'Product Launch', views: 89000, engagement: 78, retention: 81 },
-    { name: 'Tutorial Series', views: 34000, engagement: 88, retention: 85 },
-    { name: 'Concert Stream', views: 98000, engagement: 75, retention: 70 }
-  ];
+  const contentPerformance: any[] = [];
 
   const engagementData = [
-    { subject: 'Chat', A: 85, fullMark: 100 },
-    { subject: 'Reactions', A: 72, fullMark: 100 },
-    { subject: 'Shares', A: 68, fullMark: 100 },
-    { subject: 'Comments', A: 90, fullMark: 100 },
-    { subject: 'Polls', A: 55, fullMark: 100 },
-    { subject: 'Q&A', A: 78, fullMark: 100 }
+    { subject: 'Chat', A: 0, fullMark: 100 },
+    { subject: 'Reactions', A: 0, fullMark: 100 },
+    { subject: 'Shares', A: 0, fullMark: 100 },
+    { subject: 'Comments', A: 0, fullMark: 100 },
+    { subject: 'Polls', A: 0, fullMark: 100 },
+    { subject: 'Q&A', A: 0, fullMark: 100 }
   ];
 
-  const activeSessions: ViewerSession[] = [
-    {
-      id: '1',
-      userId: 'user_123',
-      location: 'New York, US',
-      device: 'Chrome on Windows',
-      duration: 1523,
-      quality: '1080p',
-      status: 'active',
-      bandwidth: 8.5
-    },
-    {
-      id: '2',
-      userId: 'user_456',
-      location: 'London, UK',
-      device: 'Safari on iPhone',
-      duration: 892,
-      quality: '720p',
-      status: 'buffering',
-      bandwidth: 4.2
-    },
-    {
-      id: '3',
-      userId: 'user_789',
-      location: 'Toronto, CA',
-      device: 'Firefox on Mac',
-      duration: 2341,
-      quality: '1080p',
-      status: 'active',
-      bandwidth: 9.1
-    }
-  ];
+  const activeSessions: ViewerSession[] = [];
 
   const exportAnalytics = () => {
     const csvContent = [
@@ -253,13 +190,10 @@ export const AnalyticsDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Real-time streaming analytics and insights</p>
-        </div>
+    <DashboardLayout
+      title="Analytics Dashboard"
+      subtitle="Real-time streaming analytics and insights"
+      actions={
         <div className="flex gap-2">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
             <SelectTrigger className="w-[140px]">
@@ -276,7 +210,7 @@ export const AnalyticsDashboard: React.FC = () => {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button variant={isLive ? 'destructive' : 'outline'} onClick={() => setIsLive(!isLive)}>
+          <Button variant={isLive ? 'destructive' : 'outline'}>
             {isLive ? (
               <>
                 <Wifi className="h-4 w-4 mr-2" />
@@ -290,9 +224,10 @@ export const AnalyticsDashboard: React.FC = () => {
             )}
           </Button>
         </div>
-      </div>
-
-      {/* Real-time Metrics */}
+      }
+    >
+      <div className="space-y-6">
+        {/* Real-time Metrics */}
       <div className="grid gap-4 md:grid-cols-4">
         {realtimeMetrics.map((metric) => (
           <Card key={metric.id} className="overflow-hidden">
@@ -963,7 +898,8 @@ export const AnalyticsDashboard: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

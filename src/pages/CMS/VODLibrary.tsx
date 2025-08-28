@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -192,18 +193,17 @@ export const VODLibrary: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">VOD Library</h1>
-          <p className="text-muted-foreground">Manage your video on demand content</p>
-        </div>
+    <DashboardLayout
+      title="VOD Library"
+      subtitle="Manage your video on demand content"
+      actions={
         <Button onClick={() => setShowUploadDialog(true)}>
           <Upload className="h-4 w-4 mr-2" />
           Upload Video
         </Button>
-      </div>
+      }
+    >
+      <div className="space-y-6">
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -588,7 +588,8 @@ export const VODLibrary: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -297,13 +298,10 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
-        </div>
+    <DashboardLayout
+      title="Settings"
+      subtitle="Manage your account and preferences"
+      actions={
         <Button onClick={saveSettings} disabled={isSaving}>
           {isSaving ? (
             <>
@@ -317,7 +315,9 @@ export const Settings: React.FC = () => {
             </>
           )}
         </Button>
-      </div>
+      }
+    >
+      <div className="space-y-6">
 
       {/* Main Settings */}
       <Tabs defaultValue="profile" className="space-y-4">
@@ -1414,7 +1414,8 @@ export const Settings: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -246,18 +247,17 @@ export const ContentScheduler: React.FC = () => {
   ).slice(0, 5);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Content Scheduler</h1>
-          <p className="text-muted-foreground">Plan and schedule your content releases</p>
-        </div>
+    <DashboardLayout
+      title="Content Scheduler"
+      subtitle="Plan and schedule your content releases"
+      actions={
         <Button onClick={() => setShowScheduleDialog(true)}>
           <CalendarIcon className="h-4 w-4 mr-2" />
           Schedule Content
         </Button>
-      </div>
+      }
+    >
+      <div className="space-y-6">
 
       {/* Overview Cards */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -797,7 +797,8 @@ export const ContentScheduler: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

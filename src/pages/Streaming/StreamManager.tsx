@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -282,22 +283,17 @@ export const StreamManager: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            Stream Manager
-            {isStreaming && (
-              <Badge variant="destructive" className="animate-pulse">
-                <Radio className="h-3 w-3 mr-1" />
-                LIVE
-              </Badge>
-            )}
-          </h1>
-          <p className="text-muted-foreground">Manage your live streaming broadcast</p>
-        </div>
-        <div className="flex gap-2">
+    <DashboardLayout
+      title="Stream Manager"
+      subtitle="Manage your live streaming broadcast"
+      actions={
+        <div className="flex gap-2 items-center">
+          {isStreaming && (
+            <Badge variant="destructive" className="animate-pulse">
+              <Radio className="h-3 w-3 mr-1" />
+              LIVE
+            </Badge>
+          )}
           <Button variant="outline" onClick={() => setShowSchedule(true)}>
             <Calendar className="h-4 w-4 mr-2" />
             Schedule
@@ -325,9 +321,10 @@ export const StreamManager: React.FC = () => {
             </Button>
           )}
         </div>
-      </div>
-
-      {/* Stream Status Alert */}
+      }
+    >
+      <div className="space-y-6">
+        {/* Stream Status Alert */}
       {streamStatus === 'error' && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -1003,7 +1000,8 @@ export const StreamManager: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -410,13 +411,10 @@ export const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">Manage team members and permissions</p>
-        </div>
+    <DashboardLayout
+      title="User Management"
+      subtitle="Manage team members and permissions"
+      actions={
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportUsers}>
             <Download className="h-4 w-4 mr-2" />
@@ -427,7 +425,9 @@ export const UserManagement: React.FC = () => {
             Invite User
           </Button>
         </div>
-      </div>
+      }
+    >
+      <div className="space-y-6">
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-5">
@@ -1119,7 +1119,8 @@ export const UserManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
