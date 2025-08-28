@@ -371,7 +371,7 @@ export default function DashboardPage() {
       )}
 
       {/* System Status Bar */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">

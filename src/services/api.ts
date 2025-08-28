@@ -512,7 +512,9 @@ class ApiClient {
 
   // Event endpoints
   async getEvents(): Promise<any> {
-    return this.request('/api/v1/events');
+    return this.request('/api/v1/events', {
+      method: 'GET'
+    });
   }
 
   async getEvent(id: string): Promise<any> {
