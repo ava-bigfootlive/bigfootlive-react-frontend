@@ -895,6 +895,7 @@ export function EventsPage() {
                 <Button 
                   onClick={handleCreateEvent}
                   className="btn-gradient hover-lift px-6 py-3 font-semibold shadow-lg"
+                  data-testid="create-event-button"
                 >
                   <Plus className="mr-2 h-5 w-5" />
                   Create Event

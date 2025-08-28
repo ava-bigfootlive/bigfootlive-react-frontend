@@ -73,10 +73,7 @@ class EventService {
    * Create a new live event
    */
   async createEvent(data: CreateEventRequest): Promise<LiveEvent> {
-    const response = await apiClient.request(this.baseUrl, {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    const response = await apiClient.post(this.baseUrl, data);
 
     // Generate RTMPS URL
     if (response.stream_key) {
@@ -91,7 +88,7 @@ class EventService {
    * Get event details
    */
   async getEvent(eventId: string): Promise<LiveEvent> {
-    const response = await apiClient.request(`${this.baseUrl}/${eventId}`);
+    const response = await apiClient.get(`${this.baseUrl}/${eventId}`);
     
     // Add streaming URLs
     if (response.stream_key) {
@@ -115,7 +112,7 @@ class EventService {
     params.append('skip', skip.toString());
     params.append('limit', limit.toString());
 
-    const response = await apiClient.request(`${this.baseUrl}?${params.toString()}`);
+    const response = await apiClient.get(`${this.baseUrl}?${params.toString()}`);
     
     // Add streaming URLs to each event
     response.items = response.items.map((event: LiveEvent) => {
@@ -133,69 +130,61 @@ class EventService {
    * Start live event (spins up container)
    */
   async startEvent(eventId: string): Promise<EventContainer> {
-    return apiClient.request(`${this.baseUrl}/${eventId}/start`, {
-      method: 'POST'
-    });
+    return apiClient.post(`${this.baseUrl}/${eventId}/start`);
   }
 
   /**
    * Stop live event (stops container and archives)
    */
   async stopEvent(eventId: string): Promise<void> {
-    return apiClient.request(`${this.baseUrl}/${eventId}/stop`, {
-      method: 'POST'
-    });
+    return apiClient.post(`${this.baseUrl}/${eventId}/stop`);
   }
 
   /**
    * Get event statistics
    */
   async getEventStats(eventId: string): Promise<EventStats> {
-    return apiClient.request(`${this.baseUrl}/${eventId}/stats`);
+    return apiClient.get(`${this.baseUrl}/${eventId}/stats`);
   }
 
   /**
    * Get event container info
    */
   async getEventContainer(eventId: string): Promise<EventContainer> {
-    return apiClient.request(`${this.containerUrl}/event/${eventId}`);
+    return apiClient.get(`${this.containerUrl}/event/${eventId}`);
   }
 
   /**
    * Update event details
    */
   async updateEvent(eventId: string, data: Partial<CreateEventRequest>): Promise<LiveEvent> {
-    return apiClient.request(`${this.baseUrl}/${eventId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data)
-    });
+    return apiClient.patch(`${this.baseUrl}/${eventId}`, data);
   }
 
   /**
    * Delete/cancel event
    */
   async deleteEvent(eventId: string): Promise<void> {
-    return apiClient.request(`${this.baseUrl}/${eventId}`, {
-      method: 'DELETE'
-    });
+    return apiClient.delete(`${this.baseUrl}/${eventId}`);
   }
 
   /**
    * Build RTMPS streaming URL
    */
   private buildRtmpsUrl(eventId: string, streamKey: string): string {
-    // In production, this would be the event container's public IP/domain
-    // For now, using placeholder that would be replaced when container starts
-    return `rtmps://stream.bigfootlive.io:1936/live/${streamKey}`;
+    // Use environment variable for RTMP URL
+    const rtmpUrl = import.meta.env.VITE_RTMP_URL || 'rtmp://localhost:1935/live';
+    return `${rtmpUrl}/${streamKey}`;
   }
 
   /**
    * Build HLS playback URL
    */
   private buildHlsUrl(eventId: string): string {
-    // CloudFront CDN URL for HLS streams
-    const cdnUrl = 'https://d39hsmqppuzm82.cloudfront.net';
-    return `${cdnUrl}/live/${eventId}/playlist.m3u8`;
+    // Use environment variable for HLS URL
+    const hlsBaseUrl = import.meta.env.VITE_HLS_BASE_URL || import.meta.env.VITE_CDN_URL || 'http://localhost:8080/hls';
+    // For local testing, use the stream key directly
+    return `${hlsBaseUrl}/${eventId}/index.m3u8`;
   }
 
   /**
@@ -204,10 +193,7 @@ class EventService {
   async testConnection(rtmpsUrl: string, streamKey: string): Promise<boolean> {
     try {
       // This would call a backend endpoint that tests the RTMP connection
-      const response = await apiClient.request('/api/v1/events/test-connection', {
-        method: 'POST',
-        body: JSON.stringify({ rtmps_url: rtmpsUrl, stream_key: streamKey })
-      });
+      const response = await apiClient.post('/api/v1/events/test-connection', { rtmps_url: rtmpsUrl, stream_key: streamKey });
       return response.connected;
     } catch {
       return false;
@@ -239,9 +225,7 @@ class EventService {
    * Convert live event recording to VOD
    */
   async convertToVod(eventId: string): Promise<{ jobId: string; mediaId: string }> {
-    return apiClient.request(`${this.baseUrl}/${eventId}/convert-to-vod`, {
-      method: 'POST'
-    });
+    return apiClient.post(`${this.baseUrl}/${eventId}/convert-to-vod`);
   }
 }
 

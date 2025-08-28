@@ -456,7 +456,8 @@ export default function VODUpload() {
           <CardContent>
             {/* Upload Area */}
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              data-testid="upload-area"
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
                 dragActive 
                   ? 'border-blue-400 bg-blue-50 dark:bg-blue-950' 
                   : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
@@ -465,6 +466,7 @@ export default function VODUpload() {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
             >
               <FileVideo className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">

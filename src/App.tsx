@@ -126,6 +126,26 @@ function App() {
             }
           />
           
+          {/* Alias for /streaming-live to match test expectations */}
+          <Route
+            path="/streaming-live"
+            element={
+              <ProtectedRoute>
+                <StreamingLivePage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Parent route for /streaming */}
+          <Route
+            path="/streaming"
+            element={
+              <ProtectedRoute>
+                <StreamingLivePage />
+              </ProtectedRoute>
+            }
+          />
+          
           <Route
             path="/select-tenant"
             element={

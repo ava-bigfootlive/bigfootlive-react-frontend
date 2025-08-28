@@ -1,0 +1,29 @@
+FROM mcr.microsoft.com/playwright:v1.48.0-focal
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY playwright.config.ts ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy test files and source (needed for imports)
+COPY tests ./tests
+COPY src ./src
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+
+# Set production test environment
+ENV CI=true
+ENV TEST_ENV=production
+ENV FRONTEND_URL=https://d2dbuyze4zqbdy.cloudfront.net
+ENV API_URL=https://api.bigfootlive.io
+ENV PLAYWRIGHT_BASE_URL=https://d2dbuyze4zqbdy.cloudfront.net
+
+# Install browsers
+RUN npx playwright install chromium
+
+# Run tests - can specify test file via environment variable
+CMD ["sh", "-c", "npx playwright test ${TEST_FILE:-tests/e2e/full-platform-audit.spec.ts} --reporter=json,line"]

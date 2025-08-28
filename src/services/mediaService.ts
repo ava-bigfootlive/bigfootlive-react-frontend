@@ -61,12 +61,9 @@ class MediaService {
    * Get presigned URL for S3 upload
    */
   async getPresignedUrl(filename: string, contentType: string = 'video/mp4'): Promise<PresignedUrlResponse> {
-    return apiClient.request('/api/v1/media/upload/presigned-url', {
-      method: 'POST',
-      body: JSON.stringify({
-        filename,
-        content_type: contentType
-      })
+    return apiClient.post('/api/v1/media/upload/presigned-url', {
+      filename,
+      content_type: contentType
     });
   }
 
@@ -126,14 +123,11 @@ class MediaService {
     description?: string,
     streamId?: string
   ): Promise<UploadCompleteResponse> {
-    return apiClient.request('/api/v1/media/upload/complete', {
-      method: 'POST',
-      body: JSON.stringify({
-        object_key: objectKey,
-        title,
-        description,
-        stream_id: streamId
-      })
+    return apiClient.post('/api/v1/media/upload/complete', {
+      object_key: objectKey,
+      title,
+      description,
+      stream_id: streamId
     });
   }
 
@@ -141,7 +135,7 @@ class MediaService {
    * Get processing status for a job
    */
   async getProcessingStatus(jobId: string): Promise<ProcessingStatus> {
-    return apiClient.request(`/api/v1/media/processing/status/${jobId}`);
+    return apiClient.get(`/api/v1/media/processing/status/${jobId}`);
   }
 
   /**
@@ -188,14 +182,14 @@ class MediaService {
    * Get media details
    */
   async getMedia(mediaId: string): Promise<MediaItem> {
-    return apiClient.request(`/api/v1/media/media/${mediaId}`);
+    return apiClient.get(`/api/v1/media/media/${mediaId}`);
   }
 
   /**
    * Get user's media
    */
   async getUserMedia(skip: number = 0, limit: number = 20): Promise<UserMediaResponse> {
-    return apiClient.request(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`);
+    return apiClient.get(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`);
   }
 
   /**

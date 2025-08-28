@@ -30,7 +30,7 @@ export function useMediaUpload() {
     ));
   }, []);
 
-  const uploadFile = useCallback(async (uploadFile: UploadFile) => {
+  const uploadSingleFile = useCallback(async (uploadFile: UploadFile) => {
     try {
       updateFileStatus(uploadFile.id, { status: 'uploading', progress: 0 });
 
@@ -111,7 +111,7 @@ export function useMediaUpload() {
     }
   }, [updateFileStatus]);
 
-  const uploadFiles_ = useCallback(async (files: File[]) => {
+  const uploadMultipleFiles = useCallback(async (files: File[]) => {
     setIsUploading(true);
 
     const newFiles: UploadFile[] = files.map(file => ({
@@ -125,11 +125,11 @@ export function useMediaUpload() {
 
     // Upload files sequentially (could be parallel with limits)
     for (const uploadFile of newFiles) {
-      await uploadFile(uploadFile);
+      await uploadSingleFile(uploadFile);
     }
 
     setIsUploading(false);
-  }, [uploadFile]);
+  }, [uploadSingleFile]);
 
   const removeFile = useCallback((fileId: string) => {
     setUploadFiles(prev => prev.filter(f => f.id !== fileId));
@@ -143,14 +143,14 @@ export function useMediaUpload() {
     const failedFiles = uploadFiles.filter(f => f.status === 'error');
     
     for (const file of failedFiles) {
-      await uploadFile(file);
+      await uploadSingleFile(file);
     }
-  }, [uploadFiles, uploadFile]);
+  }, [uploadFiles, uploadSingleFile]);
 
   return {
     uploadFiles,
     isUploading,
-    uploadFiles: uploadFiles_,
+    uploadFilesToQueue: uploadMultipleFiles,
     removeFile,
     clearCompleted,
     retryFailed

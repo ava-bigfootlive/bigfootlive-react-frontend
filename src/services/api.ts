@@ -40,7 +40,7 @@ class ApiClient {
     return headers;
   }
 
-  private async request<T>(
+  protected async request<T>(
     endpoint: string,
     options: RequestOptions = {}
   ): Promise<T> {
@@ -276,6 +276,36 @@ class ApiClient {
     if (endpoint.includes('/events')) {
       if (endpoint.match(/\/events\/[^/]+$/)) {
         return null;
+      }
+      // In development mode, return demo events for testing
+      if (import.meta.env.VITE_APP_ENV === 'development') {
+        return [
+          {
+            id: 'demo-event-1',
+            title: 'Test Streaming Event',
+            name: 'Test Streaming Event',
+            description: 'A test event for local streaming',
+            start_time: new Date().toISOString(),
+            status: 'scheduled',
+            is_private: false,
+            stream_key: 'test123',
+            rtmp_url: import.meta.env.VITE_RTMP_URL || 'rtmp://localhost:1935/live',
+            hls_url: `${import.meta.env.VITE_HLS_BASE_URL || 'http://localhost:8080/hls'}/test123/index.m3u8`
+          },
+          {
+            id: 'demo-event-2',
+            title: 'Live Demo Stream',
+            name: 'Live Demo Stream',
+            description: 'Currently streaming demo',
+            start_time: new Date(Date.now() - 3600000).toISOString(),
+            status: 'live',
+            is_private: false,
+            viewer_count: 42,
+            stream_key: 'demo-live',
+            rtmp_url: import.meta.env.VITE_RTMP_URL || 'rtmp://localhost:1935/live',
+            hls_url: `${import.meta.env.VITE_HLS_BASE_URL || 'http://localhost:8080/hls'}/demo-live/index.m3u8`
+          }
+        ];
       }
       return [];
     }
@@ -539,37 +569,6 @@ class ApiClient {
     });
   }
 
-  // Media/VOD endpoints
-  async getUploadUrl(filename: string, contentType: string = 'video/mp4'): Promise<any> {
-    return this.request('/api/v1/media/upload/presigned-url', {
-      method: 'POST',
-      body: JSON.stringify({ filename, content_type: contentType }),
-    });
-  }
-
-  async completeUpload(objectKey: string, title?: string, description?: string, streamId?: string): Promise<any> {
-    return this.request('/api/v1/media/upload/complete', {
-      method: 'POST',
-      body: JSON.stringify({ 
-        object_key: objectKey, 
-        title,
-        description,
-        stream_id: streamId
-      }),
-    });
-  }
-
-  async getProcessingStatus(jobId: string): Promise<any> {
-    return this.request(`/api/v1/media/processing/status/${jobId}`);
-  }
-
-  async getUserMedia(skip: number = 0, limit: number = 20): Promise<any> {
-    return this.request(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`);
-  }
-
-  async getMedia(mediaId: string): Promise<any> {
-    return this.request(`/api/v1/media/media/${mediaId}`);
-  }
 
   // Stream endpoints
   async getStreams(): Promise<any> {
@@ -638,15 +637,22 @@ class ApiClient {
     });
   }
 
-  async completeUpload(objectKey: string, filename: string, fileSize: number): Promise<any> {
+  async completeUpload(objectKey: string, filename: string, fileSize?: number): Promise<any> {
+    const body: any = { 
+      object_key: objectKey, 
+      filename
+    };
+    if (fileSize !== undefined) {
+      body.file_size = fileSize;
+    }
     return this.request('/api/v1/media/upload/complete', {
       method: 'POST',
-      body: JSON.stringify({ 
-        object_key: objectKey, 
-        filename, 
-        file_size: fileSize 
-      }),
+      body: JSON.stringify(body),
     });
+  }
+
+  async getProcessingStatus(jobId: string): Promise<any> {
+    return this.request(`/api/v1/media/processing/status/${jobId}`);
   }
 
   async getUserMedia(page: number = 1, limit: number = 20): Promise<any> {
