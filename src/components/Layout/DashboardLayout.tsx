@@ -20,9 +20,9 @@ export function DashboardLayout({ children, title, subtitle, actions }: Dashboar
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       
       {/* Main content */}
-      <div className="lg:ml-64 transition-all duration-300 ease-in-out">
+      <div className="lg:ml-72 transition-all duration-300 ease-in-out">
         {/* Header */}
-        <header className="card-modern sticky top-0 z-40 border-b" style={{
+        <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{
           backgroundColor: 'hsl(var(--surface))',
           borderColor: 'hsl(var(--border))'
         }}>

@@ -41,7 +41,7 @@ interface MediaAsset {
   metadata?: any;
 }
 
-export default function MediaAssets() {
+export default function MediaAssetsPage() {
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<MediaAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null);

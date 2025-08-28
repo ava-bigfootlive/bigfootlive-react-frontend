@@ -93,7 +93,7 @@ interface Playlist {
   updated_at: string;
 }
 
-export default function PlaylistManager() {
+export default function PlaylistManagerPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [availableMedia, setAvailableMedia] = useState<any[]>([]);

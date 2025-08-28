@@ -104,21 +104,10 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       title: 'Content',
       icon: FolderOpen,
       items: [
-        { path: '/media-assets', label: 'Media Library', icon: FolderOpen },
         { path: '/vod-library', label: 'VOD Library', icon: Video },
         { path: '/asset-manager', label: 'Asset Manager', icon: Database },
         { path: '/content-scheduler', label: 'Content Scheduler', icon: Calendar },
-        { path: '/playlists', label: 'Playlist Manager', icon: List },
         { path: '/embed-generator', label: 'Embed Generator', icon: Code },
-      ]
-    },
-    {
-      title: 'Monetization',
-      icon: DollarSign,
-      items: [
-        { path: '/subscription-manager', label: 'Subscriptions', icon: CreditCard },
-        { path: '/pay-per-view', label: 'Pay-Per-View', icon: TicketCheck },
-        { path: '/revenue-analytics', label: 'Revenue Analytics', icon: TrendingUp },
       ]
     },
     {
