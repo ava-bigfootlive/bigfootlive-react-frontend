@@ -480,7 +480,7 @@ export default function StreamingLivePage() {
               
               {/* Event Selector */}
               <Select 
-                value={state.selectedEvent?.id || ''} 
+                value={state.selectedEvent?.id || 'no-selection'} 
                 onValueChange={handleEventSelect}
               >
                 <SelectTrigger className="w-[250px] bg-gray-700 border-gray-600 text-white">

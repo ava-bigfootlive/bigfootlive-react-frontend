@@ -91,8 +91,8 @@ export default function WebRTCStreaming() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [screenShare, setScreenShare] = useState(false);
-  const [selectedCamera, setSelectedCamera] = useState<string>('');
-  const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
+  const [selectedCamera, setSelectedCamera] = useState<string>('default');
+  const [selectedMicrophone, setSelectedMicrophone] = useState<string>('default');
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [microphones, setMicrophones] = useState<MediaDeviceInfo[]>([]);
   const [viewerCount, setViewerCount] = useState(0);
@@ -155,15 +155,23 @@ export default function WebRTCStreaming() {
     const getDevices = async () => {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        setCameras(devices.filter(device => device.kind === 'videoinput'));
-        setMicrophones(devices.filter(device => device.kind === 'audioinput'));
+        // Filter out devices with empty deviceId
+        const validCameras = devices.filter(device => 
+          device.kind === 'videoinput' && device.deviceId && device.deviceId.trim() !== ''
+        );
+        const validMicrophones = devices.filter(device => 
+          device.kind === 'audioinput' && device.deviceId && device.deviceId.trim() !== ''
+        );
         
-        // Set default devices
-        if (devices.length > 0) {
-          const defaultCamera = devices.find(d => d.kind === 'videoinput');
-          const defaultMic = devices.find(d => d.kind === 'audioinput');
-          if (defaultCamera) setSelectedCamera(defaultCamera.deviceId);
-          if (defaultMic) setSelectedMicrophone(defaultMic.deviceId);
+        setCameras(validCameras);
+        setMicrophones(validMicrophones);
+        
+        // Set default devices if available
+        if (validCameras.length > 0 && selectedCamera === 'default') {
+          setSelectedCamera(validCameras[0].deviceId);
+        }
+        if (validMicrophones.length > 0 && selectedMicrophone === 'default') {
+          setSelectedMicrophone(validMicrophones[0].deviceId);
         }
       } catch (error) {
         console.error('Error enumerating devices:', error);
@@ -682,11 +690,17 @@ export default function WebRTCStreaming() {
                           <SelectValue placeholder="Select camera" />
                         </SelectTrigger>
                         <SelectContent>
-                          {cameras.map(camera => (
-                            <SelectItem key={camera.deviceId} value={camera.deviceId}>
-                              {camera.label || 'Unknown Camera'}
+                          {cameras.length === 0 ? (
+                            <SelectItem value="no-device" disabled>
+                              No cameras detected
                             </SelectItem>
-                          ))}
+                          ) : (
+                            cameras.map(camera => (
+                              <SelectItem key={camera.deviceId} value={camera.deviceId}>
+                                {camera.label || 'Unknown Camera'}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -769,11 +783,17 @@ export default function WebRTCStreaming() {
                           <SelectValue placeholder="Select microphone" />
                         </SelectTrigger>
                         <SelectContent>
-                          {microphones.map(mic => (
-                            <SelectItem key={mic.deviceId} value={mic.deviceId}>
-                              {mic.label || 'Unknown Microphone'}
+                          {microphones.length === 0 ? (
+                            <SelectItem value="no-device" disabled>
+                              No microphones detected
                             </SelectItem>
-                          ))}
+                          ) : (
+                            microphones.map(mic => (
+                              <SelectItem key={mic.deviceId} value={mic.deviceId}>
+                                {mic.label || 'Unknown Microphone'}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
