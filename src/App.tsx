@@ -14,7 +14,7 @@ import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import DashboardPage from './pages/DashboardEnhanced';
 import VODUploadPage from './pages/VODUpload';
-import StreamingLivePage from './pages/StreamingLive';
+import StreamingLivePage from './pages/StreamingLiveMinimal';
 import PlatformAdminPage from './pages/PlatformAdmin';
 import SelectTenantPage from './pages/SelectTenant';
 import UnauthorizedPage from './pages/Unauthorized';
