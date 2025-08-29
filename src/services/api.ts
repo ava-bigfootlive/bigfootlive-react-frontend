@@ -1,6 +1,7 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { errorHandler, AppError, ErrorType, ErrorSeverity } from '@/utils/errorHandler';
 import { toast } from '@/components/ui/use-toast';
+import { apiHealth } from './apiHealth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.bigfootlive.io';
 
@@ -77,6 +78,12 @@ class ApiClient {
     skipErrorHandler: boolean,
     retryConfig: RetryConfig
   ): Promise<T> {
+    // Check if this endpoint should be skipped
+    if (!apiHealth.shouldCallEndpoint(endpoint)) {
+      // Return empty response immediately without making the request
+      return this.getEmptyResponse(endpoint, fetchOptions.method || 'GET') as T;
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -105,6 +112,8 @@ class ApiClient {
         // For 404/405 errors, return empty data instead of throwing
         // These are expected when backend endpoints don't exist yet
         if (response.status === 404 || response.status === 405) {
+          // Record this error to prevent future attempts
+          apiHealth.recordError(endpoint, response.status);
           // Don't log to console, just return empty response
           return this.getEmptyResponse(endpoint, fetchOptions.method || 'GET') as T;
         }
@@ -197,6 +206,7 @@ class ApiClient {
       }
 
       // Handle successful response
+      apiHealth.recordSuccess(endpoint);
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         return response.json();
