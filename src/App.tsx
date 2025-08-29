@@ -57,6 +57,8 @@ import NotificationCenter from './pages/Notifications/NotificationCenter';
 import MicrositesBuilder from './pages/Microsites/MicrositesBuilder';
 import WhiteLabelConfig from './pages/WhiteLabel/WhiteLabelConfig';
 import IntegrationsHub from './pages/Integrations/IntegrationsHub';
+import PollsQAPage from './pages/PollsQA';
+import ReactionsPage from './pages/Reactions';
 import UserManagement from './pages/Users/UserManagement';
 import Settings from './pages/Settings/Settings';
 import HelpCenter from './pages/Help/HelpCenter';
@@ -207,6 +209,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/polls"
+            element={
+              <ProtectedRoute>
+                <PollsQAPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reactions"
+            element={
+              <ProtectedRoute>
+                <ReactionsPage />
               </ProtectedRoute>
             }
           />

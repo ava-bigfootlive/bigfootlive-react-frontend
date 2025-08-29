@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '../../components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -294,18 +295,19 @@ export const IntegrationsHub: React.FC = () => {
   const errorCount = integrations.filter(i => i.status === 'error').length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Integrations Hub</h1>
-          <p className="text-muted-foreground">Connect your favorite tools and services</p>
+    <DashboardLayout title="Integrations">
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Integrations Hub</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Connect your favorite tools and services</p>
+          </div>
+          <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-100">
+            <Plus className="h-4 w-4 mr-2" />
+            Request Integration
+          </Button>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Request Integration
-        </Button>
-      </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -841,7 +843,8 @@ export const IntegrationsHub: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

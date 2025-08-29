@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Radio,
   Video,
@@ -54,7 +54,53 @@ interface NavSection {
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['streaming', 'content']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(() => {
+    // Load expanded sections from localStorage
+    const saved = localStorage.getItem('sidebarExpandedSections');
+    return saved ? JSON.parse(saved) : ['streaming', 'content'];
+  });
+
+  // Save expanded sections to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+  }, [expandedSections]);
+
+  // Auto-expand sections when their child is active
+  useEffect(() => {
+    const path = location.pathname;
+    
+    // Check each section to see if it should be expanded
+    const sectionsToExpand: string[] = [];
+    
+    if (path.startsWith('/streaming/')) {
+      sectionsToExpand.push('streaming');
+    }
+    if (path.startsWith('/media') || path.startsWith('/vod') || path.startsWith('/playlists')) {
+      sectionsToExpand.push('content');
+    }
+    if (path.startsWith('/chat') || path.startsWith('/polls') || path.startsWith('/reactions')) {
+      sectionsToExpand.push('engagement');
+    }
+    if (path.startsWith('/white-label') || path.startsWith('/microsites') || path.startsWith('/integrations') || path.startsWith('/embed')) {
+      sectionsToExpand.push('platform');
+    }
+    if (path.startsWith('/admin') || path.startsWith('/users') || path.startsWith('/platform-admin') || path.startsWith('/saml')) {
+      sectionsToExpand.push('admin');
+    }
+    
+    // Add any new sections that need to be expanded
+    if (sectionsToExpand.length > 0) {
+      setExpandedSections(prev => {
+        const newSections = [...prev];
+        sectionsToExpand.forEach(section => {
+          if (!newSections.includes(section)) {
+            newSections.push(section);
+          }
+        });
+        return newSections;
+      });
+    }
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     try {
