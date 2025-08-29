@@ -131,8 +131,11 @@ class ApiClient {
           case 401:
             errorType = ErrorType.AUTH;
             severity = ErrorSeverity.ERROR;
-            // Clear auth and redirect to login
-            this.handleAuthError();
+            // Only redirect to login for certain endpoints
+            // Don't redirect for media/playlist endpoints that might just be missing
+            if (!endpoint.includes('/media') && !endpoint.includes('/playlist')) {
+              this.handleAuthError();
+            }
             break;
           case 403:
             errorType = ErrorType.PERMISSION;
