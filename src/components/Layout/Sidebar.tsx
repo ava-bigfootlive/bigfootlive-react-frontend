@@ -1,42 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-  Home,
-  Upload,
+  Radio,
   Video,
-  Users,
-  Calendar,
-  BarChart3,
-  MessageSquare,
-  FileText,
   Settings,
   LogOut,
   X,
+  BarChart3,
+  Calendar,
+  Library,
+  User,
   Shield,
-  List,
-  Code,
-  Radio,
-  DollarSign,
-  CreditCard,
-  TrendingUp,
-  FolderOpen,
-  Layout,
-  Bell,
-  Zap,
-  Palette,
-  Plug,
-  Activity,
-  Wifi,
-  Layers,
-  PlayCircle,
-  Database,
-  TicketCheck,
-  HelpCircle,
-  ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,40 +23,21 @@ interface SidebarProps {
   setSidebarOpen: (open: boolean) => void;
 }
 
-interface NavSection {
-  title: string;
-  items: NavItem[];
-  icon?: React.ComponentType<{ className?: string }>;
-}
-
 interface NavItem {
   path: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-  subItems?: NavItem[];
+  description?: string;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
 }
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
-  
-  // Initialize expanded sections from localStorage or with defaults
-  const [expandedSections, setExpandedSections] = useState<string[]>(() => {
-    const saved = localStorage.getItem('sidebarExpandedSections');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Default to all sections expanded for better UX
-    return ['main', 'streaming', 'content', 'management', 'analytics', 'platform', 'admin'];
-  });
-
-  // Save expanded sections to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
-  }, [expandedSections]);
-
-
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -87,209 +46,185 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     }
   };
 
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev =>
-      prev.includes(section)
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
-    );
-  };
-
-  const navSections: NavSection[] = [
-    {
-      title: 'Main',
-      items: [
-        { path: '/dashboard', label: 'Dashboard', icon: Home },
-        { path: '/events', label: 'Events', icon: Calendar },
-      ]
+  // Hyper-minimal navigation - only essentials
+  const primaryNav: NavItem[] = [
+    { 
+      path: '/dashboard', 
+      label: 'Home', 
+      icon: Home
     },
-    {
-      title: 'Streaming',
-      icon: Radio,
-      items: [
-        { path: '/streaming/live', label: 'Go Live', icon: Radio },
-        { path: '/streaming/webrtc', label: 'WebRTC Streaming', icon: Wifi },
-        { path: '/streaming/rtmp', label: 'RTMP Configuration', icon: Activity },
-        { path: '/streaming/hls', label: 'HLS Adaptive Bitrate', icon: Layers },
-        { path: '/streaming/health', label: 'Stream Health Monitor', icon: Activity },
-        { path: '/stream-manager', label: 'Stream Manager', icon: PlayCircle },
-      ]
+    { 
+      path: '/streaming/live', 
+      label: 'Stream', 
+      icon: Radio
     },
-    {
-      title: 'Content',
-      icon: FolderOpen,
-      items: [
-        { path: '/vod-library', label: 'VOD Library', icon: Video },
-        { path: '/asset-manager', label: 'Asset Manager', icon: Database },
-        { path: '/content-scheduler', label: 'Content Scheduler', icon: Calendar },
-        { path: '/embed-generator', label: 'Embed Generator', icon: Code },
-      ]
+    { 
+      path: '/events', 
+      label: 'Events', 
+      icon: Calendar
     },
-    {
-      title: 'Management',
-      icon: Users,
-      items: [
-        { path: '/users', label: 'User Management', icon: Users },
-        { path: '/user-management', label: 'Team Management', icon: Shield },
-        { path: '/event-management', label: 'Event Management', icon: Zap },
-      ]
-    },
-    {
-      title: 'Analytics',
-      icon: BarChart3,
-      items: [
-        { path: '/analytics', label: 'Analytics Overview', icon: BarChart3 },
-        { path: '/analytics-dashboard', label: 'Analytics Dashboard', icon: TrendingUp },
-      ]
-    },
-    {
-      title: 'Platform',
-      icon: Settings,
-      items: [
-        { path: '/chat', label: 'Chat', icon: MessageSquare },
-        { path: '/settings', label: 'Settings', icon: Settings },
-        { path: '/integrations', label: 'Integrations', icon: Plug },
-        { path: '/white-label', label: 'White Label', icon: Palette },
-        { path: '/microsites', label: 'Microsites', icon: Layout },
-        { path: '/notifications', label: 'Notifications', icon: Bell },
-        { path: '/help', label: 'Help Center', icon: HelpCircle },
-        { path: '/docs', label: 'Documentation', icon: FileText },
-      ]
+    { 
+      path: '/analytics', 
+      label: 'Analytics', 
+      icon: BarChart3
     },
   ];
 
-  // Admin-only sections
-  const adminSections: NavSection[] = [
-    {
-      title: 'Admin',
-      icon: Shield,
-      items: [
-        { path: '/platform-admin', label: 'Platform Admin', icon: Shield },
-        { path: '/admin-dashboard', label: 'Admin Dashboard', icon: Shield },
-        { path: '/saml-config', label: 'SAML Config', icon: Shield },
-      ]
-    }
+  // Secondary navigation items
+  const secondaryNav: NavItem[] = [
+    { 
+      path: '/vod-library', 
+      label: 'Library', 
+      icon: Library
+    },
+    { 
+      path: '/settings', 
+      label: 'Settings', 
+      icon: Settings
+    },
   ];
 
+  // Add admin link if user is admin
   const isAdmin = user?.['custom:role'] === 'admin' || user?.['custom:role'] === 'superadmin';
-  const allSections = isAdmin ? [...navSections, ...adminSections] : navSections;
-
-  // Auto-expand section containing current route
-  useEffect(() => {
-    for (const section of allSections) {
-      const hasActivePath = section.items.some(item => location.pathname === item.path);
-      if (hasActivePath && !expandedSections.includes(section.title.toLowerCase())) {
-        setExpandedSections(prev => [...prev, section.title.toLowerCase()]);
-        break;
-      }
-    }
-  }, [location.pathname]);
-
-  const renderNavItem = (item: NavItem, depth: number = 0) => {
-    const isActive = location.pathname === item.path;
-    const Icon = item.icon;
-
-    return (
-      <Link
-        key={item.path}
-        to={item.path}
-        className={cn(
-          'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
-          isActive
-            ? 'bg-accent text-accent-foreground'
-            : 'text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground'
-        )}
-        style={{ paddingLeft: `${12 + depth * 16}px` }}
-      >
-        <div className="flex items-center gap-3">
-          <Icon className="h-4 w-4" />
-          <span>{item.label}</span>
-        </div>
-        {item.badge && (
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-            {item.badge}
-          </span>
-        )}
-      </Link>
-    );
-  };
+  if (isAdmin) {
+    secondaryNav.push({
+      path: '/admin-dashboard',
+      label: 'Admin',
+      icon: Shield
+    });
+  }
 
   return (
-    <aside className={cn(
-      'fixed inset-y-0 left-0 z-50 w-72 transform bg-card border-r border-border transition-transform duration-200 ease-in-out',
-      sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-      'lg:translate-x-0 lg:fixed'
-    )}>
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-border">
-          <h2 className="text-xl font-bold text-foreground">BigfootLive</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {/* Navigation */}
-        <ScrollArea className="flex-1 px-3 py-4">
-          <div className="space-y-6">
-            {allSections.map((section) => {
-              const isExpanded = expandedSections.includes(section.title.toLowerCase());
-              const SectionIcon = section.icon;
+    <>
+      {/* Mobile backdrop with blur */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-              return (
-                <div key={section.title}>
-                  <button
-                    onClick={() => toggleSection(section.title.toLowerCase())}
-                    className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      {SectionIcon && <SectionIcon className="h-3 w-3" />}
-                      <span>{section.title}</span>
-                    </div>
-                    {isExpanded ? (
-                      <ChevronDown className="h-3 w-3" />
-                    ) : (
-                      <ChevronRight className="h-3 w-3" />
-                    )}
-                  </button>
-                  {isExpanded && (
-                    <div className="mt-2 space-y-1">
-                      {section.items.map(item => renderNavItem(item))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
-        
-        {/* User section */}
-        <div className="border-t border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">
-                {user?.given_name || user?.email}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {user?.email}
-              </p>
-            </div>
+      {/* Hyper-Minimalist Sidebar */}
+      <aside className={cn(
+        'fixed inset-y-0 left-0 z-50 w-64 transform bg-white transition-transform duration-300 ease-out',
+        'dark:bg-gray-950 border-r border-gray-100 dark:border-gray-900',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        'lg:translate-x-0'
+      )}>
+        <div className="flex h-full flex-col">
+          {/* Minimal Header */}
+          <div className="flex h-16 items-center justify-between px-5 border-b border-gray-100 dark:border-gray-900">
+            <Link to="/dashboard" className="flex items-center space-x-2.5">
+              <div className="h-8 w-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
+                <Radio className="h-4 w-4 text-white dark:text-black" />
+              </div>
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                BigFoot
+              </span>
+            </Link>
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleSignOut}
-              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden -mr-2"
             >
-              <LogOut className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Quick Action */}
+          <div className="px-4 py-4">
+            <Link
+              to="/streaming/live"
+              className={cn(
+                "w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2.5",
+                "bg-black dark:bg-white text-white dark:text-black",
+                "hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors duration-200",
+                "font-medium text-sm"
+              )}
+            >
+              <Radio className="h-3.5 w-3.5" />
+              <span>Go Live</span>
+            </Link>
+          </div>
+
+          {/* Minimal Navigation */}
+          <nav className="flex-1 px-4 py-2 overflow-y-auto">
+            {/* Primary Navigation */}
+            <div className="space-y-1">
+              {primaryNav.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
+                      isActive
+                        ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
+                        : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Divider */}
+            <div className="my-4 h-px bg-gray-200 dark:bg-gray-800" />
+
+            {/* Secondary Navigation */}
+            <div className="space-y-1">
+              {secondaryNav.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
+                      isActive
+                        ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
+                        : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* Minimal User Section */}
+          <div className="border-t border-gray-100 dark:border-gray-900 p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {user?.given_name || user?.email?.split('@')[0] || 'User'}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSignOut}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mr-2"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

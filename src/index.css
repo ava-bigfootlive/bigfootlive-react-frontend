@@ -210,10 +210,37 @@
   .max-w-none { max-width: none; }
 }
 
-/* Animations */
+/* Hyper-minimalist theme overrides */
+@layer components {
+  /* Reduced motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Minimalist card styles */
+  .minimal-card {
+    @apply bg-white dark:bg-gray-950 rounded-lg border-0 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Focus visible styles for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-black dark:outline-white;
+  }
+
+  /* Remove default button styles for minimal look */
+  button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-black dark:outline-white;
+  }
+}
+
+/* Microinteractions and Animations */
 @keyframes slide-up {
   from {
-    transform: translateY(10px);
+    transform: translateY(8px);
     opacity: 0;
   }
   to {
@@ -231,10 +258,73 @@
   }
 }
 
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.2s ease-out;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-from-left 0.2s ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hover states for interactive elements */
+@layer utilities {
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-0.5;
+  }
+  
+  .hover-grow {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .hover-glow {
+    @apply transition-shadow duration-200 hover:shadow-lg;
+  }
+  
+  /* Active states */
+  .active-scale {
+    @apply active:scale-95 transition-transform duration-100;
+  }
 }

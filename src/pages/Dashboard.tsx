@@ -1,534 +1,306 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 import { 
-  Activity, 
+  Radio,
   Users, 
   PlayCircle, 
   Calendar,
   TrendingUp,
-  PlusCircle,
   BarChart3,
-  DollarSign,
   Eye,
   Clock,
-  Settings,
-  Bell,
-  Star,
-  ArrowUpRight,
-  ArrowDownRight,
-  Zap,
-  Shield,
-  Headphones,
-  FileText,
-  ChevronRight,
-  Globe,
-  Wifi,
-  WifiOff,
-  CheckCircle,
-  AlertTriangle,
   Video,
-  MoreVertical,
-  Download,
-  Share2,
-  Info
+  ArrowRight,
+  Zap,
+  Activity
 } from 'lucide-react';
 import api from '../services/api';
-import { cn } from '@/lib/utils';
 
-interface DashboardStats {
-  totalEvents: number;
-  activeStreams: number;
-  totalViewers: number;
-  upcomingEvents: number;
-  revenue: number;
-  watchTime: number;
-  peakViewers: number;
-  engagement: number;
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'stream_started' | 'stream_ended' | 'new_subscriber' | 'payment_received' | 'user_joined';
-  title: string;
-  description: string;
-  timestamp: Date;
-  status: 'success' | 'warning' | 'info';
+interface QuickStat {
+  label: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down';
 }
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalEvents: 0,
-    activeStreams: 0,
-    totalViewers: 0,
-    upcomingEvents: 0,
-    revenue: 0,
-    watchTime: 0,
-    peakViewers: 0,
-    engagement: 0
-  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [activeStreams, setActiveStreams] = useState(0);
+  const [viewerCount, setViewerCount] = useState(0);
 
   useEffect(() => {
-    fetchDashboardData();
+    // Simulated data loading
+    setTimeout(() => {
+      setActiveStreams(3);
+      setViewerCount(1847);
+      setLoading(false);
+    }, 500);
   }, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      // For now, use mock data since API is returning 405
-      setStats({
-        totalEvents: 24,
-        activeStreams: 3,
-        totalViewers: 1847,
-        upcomingEvents: 7,
-        revenue: 12543,
-        watchTime: 3847,
-        peakViewers: 562,
-        engagement: 0.74
-      });
-
-      setRecentActivity([
-        {
-          id: '1',
-          type: 'stream_started',
-          title: 'Live stream started',
-          description: 'Marketing Webinar - Q4 Updates',
-          timestamp: new Date(Date.now() - 30 * 60 * 1000),
-          status: 'success'
-        },
-        {
-          id: '2',
-          type: 'new_subscriber',
-          title: 'New subscriber',
-          description: 'john.doe@example.com joined Premium plan',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          status: 'success'
-        },
-        {
-          id: '3',
-          type: 'payment_received',
-          title: 'Payment received',
-          description: '$29.99 subscription payment',
-          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-          status: 'success'
-        }
-      ]);
-
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-      setError('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'stream_started': return PlayCircle;
-      case 'stream_ended': return Video;
-      case 'new_subscriber': return Users;
-      case 'payment_received': return DollarSign;
-      case 'user_joined': return Users;
-      default: return Activity;
-    }
-  };
-
-  const getActivityColor = (status: string) => {
-    switch (status) {
-      case 'success': return 'text-green-600 bg-green-50 dark:bg-green-950/50';
-      case 'warning': return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950/50';
-      case 'info': return 'text-blue-600 bg-blue-50 dark:bg-blue-950/50';
-      default: return 'text-gray-600 bg-gray-50 dark:bg-gray-950/50';
-    }
-  };
+  const quickStats: QuickStat[] = [
+    { label: 'Live Now', value: activeStreams, trend: 'up' },
+    { label: 'Viewers', value: viewerCount.toLocaleString(), change: '+12%', trend: 'up' },
+    { label: 'Today', value: '7 events' },
+    { label: 'Revenue', value: '$2,847', change: '+8%', trend: 'up' },
+  ];
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      {/* Header */}
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.given_name || user?.email || 'Streamer'}
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon">
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => navigate('/streaming/live')}>
-            <PlayCircle className="mr-2 h-4 w-4" />
-            Go Live
-          </Button>
-        </div>
+    <div className="flex-1 p-6 lg:p-8 max-w-[1400px] mx-auto">
+      {/* Minimal Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Welcome back{user?.given_name ? `, ${user.given_name}` : ''}
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Here's what's happening with your streams today
+        </p>
       </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Revenue
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${loading ? '...' : stats.revenue.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 dark:text-green-400">+20.1%</span> from last month
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Viewers
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? '...' : stats.totalViewers.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 dark:text-green-400">+180</span> in last hour
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Live Streams
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? '...' : stats.activeStreams}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats.upcomingEvents} scheduled today
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Engagement Rate
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? '...' : `${(stats.engagement * 100).toFixed(1)}%`}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 dark:text-green-400">+7%</span> from last week
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Recent Activity */}
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Latest events and updates from your platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[350px] pr-4">
-              <div className="space-y-4">
-                {loading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <div className="text-muted-foreground">Loading activity...</div>
+      {/* Bento Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Hero Card - Go Live */}
+        <Card className="md:col-span-2 lg:col-span-2 border-0 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer group"
+              onClick={() => navigate('/streaming/live')}>
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="inline-flex items-center gap-2 mb-3">
+                  <div className="h-8 w-8 rounded-lg bg-red-500 flex items-center justify-center">
+                    <Radio className="h-4 w-4 text-white" />
                   </div>
-                ) : recentActivity.length > 0 ? (
-                  recentActivity.map((activity) => {
-                    const Icon = getActivityIcon(activity.type);
-                    return (
-                      <div key={activity.id} className="flex items-start space-x-4">
-                        <div className={cn(
-                          "rounded-full p-2",
-                          getActivityColor(activity.status)
-                        )}>
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 space-y-1">
-                          <p className="text-sm font-medium leading-none">
-                            {activity.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {activity.description}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {activity.timestamp.toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-32 text-center">
-                    <Activity className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                    <p className="text-muted-foreground">No recent activity</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Activity will appear here as you use the platform
-                    </p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Overview */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>
-              Your streaming performance this month
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Stream Health</span>
+                  <span className="text-xs font-medium text-red-500 uppercase tracking-wide">Live</span>
                 </div>
-                <span className="font-medium">Excellent</span>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Start Streaming
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Go live instantly with professional streaming tools
+                </p>
+                <div className="inline-flex items-center text-sm font-medium text-gray-900 dark:text-white group-hover:gap-2 transition-all">
+                  Go Live Now
+                  <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
-              <Progress value={95} className="h-2" />
+              <div className="hidden lg:block">
+                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 flex items-center justify-center">
+                  <PlayCircle className="h-12 w-12 text-red-500" />
+                </div>
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <Separator />
+        {/* Quick Stats */}
+        {quickStats.slice(0, 2).map((stat, idx) => (
+          <Card key={idx} className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardContent className="p-6">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                {stat.label}
+              </p>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                {loading ? '—' : stat.value}
+              </p>
+              {stat.change && (
+                <p className={cn(
+                  "text-xs mt-2",
+                  stat.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                )}>
+                  {stat.change}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
 
+        {/* Analytics Preview */}
+        <Card className="lg:col-span-2 border-0 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              onClick={() => navigate('/analytics')}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-gray-400" />
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Analytics</span>
+              </div>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                View All
+              </Button>
+            </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Watch Time</span>
-                </div>
-                <span className="text-sm font-medium">
-                  {Math.floor(stats.watchTime / 60)}h {stats.watchTime % 60}m
-                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Watch Time</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">64h 23m</span>
               </div>
-              
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Eye className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Peak Viewers</span>
-                </div>
-                <span className="text-sm font-medium">
-                  {stats.peakViewers.toLocaleString()}
-                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Peak Viewers</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">562</span>
               </div>
-              
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Total Events</span>
-                </div>
-                <span className="text-sm font-medium">
-                  {stats.totalEvents}
-                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Engagement</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">74%</span>
               </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Quick Actions</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="justify-start"
-                  onClick={() => navigate('/events')}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Events
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="justify-start"
-                  onClick={() => navigate('/analytics')}
-                >
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Analytics
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="justify-start"
-                  onClick={() => navigate('/vod-library')}
-                >
-                  <Video className="mr-2 h-4 w-4" />
-                  VOD
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="justify-start"
-                  onClick={() => navigate('/settings')}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* System Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>System Status</CardTitle>
-            <CardDescription>
-              Current platform health
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Wifi className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Streaming</span>
-              </div>
-              <Badge variant="outline" className="text-green-600">
-                Operational
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Globe className="h-4 w-4 text-green-600" />
-                <span className="text-sm">CDN</span>
-              </div>
-              <Badge variant="outline" className="text-green-600">
-                Operational
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Database</span>
-              </div>
-              <Badge variant="outline" className="text-green-600">
-                Operational
-              </Badge>
             </div>
           </CardContent>
         </Card>
 
         {/* Upcoming Events */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
-            <CardDescription>
-              Next scheduled streams
-            </CardDescription>
+        <Card className="lg:col-span-2 border-0 shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">Upcoming</CardTitle>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs"
+                      onClick={() => navigate('/events')}>
+                View All
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Product Launch</p>
-                  <p className="text-xs text-muted-foreground">Today, 2:00 PM</p>
-                </div>
-                <Button size="sm" variant="outline">
-                  View
-                </Button>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3 group cursor-pointer"
+                 onClick={() => navigate('/events')}>
+              <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center flex-shrink-0">
+                <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Team Meeting</p>
-                  <p className="text-xs text-muted-foreground">Today, 4:00 PM</p>
-                </div>
-                <Button size="sm" variant="outline">
-                  View
-                </Button>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  Product Launch
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Today, 2:00 PM • 247 registered
+                </p>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Weekly Webinar</p>
-                  <p className="text-xs text-muted-foreground">Tomorrow, 10:00 AM</p>
-                </div>
-                <Button size="sm" variant="outline">
-                  View
-                </Button>
+            </div>
+            <div className="flex items-center gap-3 group cursor-pointer"
+                 onClick={() => navigate('/events')}>
+              <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center flex-shrink-0">
+                <Video className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  Team Meeting
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Today, 4:00 PM • Internal
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Help & Resources */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Help & Resources</CardTitle>
-            <CardDescription>
-              Get started with BigFootLive
-            </CardDescription>
+        {/* Quick Actions Grid */}
+        <Card className="md:col-span-2 lg:col-span-4 border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => navigate('/docs')}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Documentation
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => navigate('/help')}
-            >
-              <Headphones className="mr-2 h-4 w-4" />
-              Support Center
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => window.open('https://status.bigfootlive.io', '_blank')}
-            >
-              <Info className="mr-2 h-4 w-4" />
-              Platform Status
-            </Button>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Button variant="outline" className="h-auto flex-col py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      onClick={() => navigate('/events/new')}>
+                <Calendar className="h-5 w-5 mb-2 text-gray-600 dark:text-gray-400" />
+                <span className="text-xs font-medium">Schedule</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      onClick={() => navigate('/vod-library')}>
+                <Video className="h-5 w-5 mb-2 text-gray-600 dark:text-gray-400" />
+                <span className="text-xs font-medium">Library</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      onClick={() => navigate('/analytics')}>
+                <BarChart3 className="h-5 w-5 mb-2 text-gray-600 dark:text-gray-400" />
+                <span className="text-xs font-medium">Analytics</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      onClick={() => navigate('/settings')}>
+                <Zap className="h-5 w-5 mb-2 text-gray-600 dark:text-gray-400" />
+                <span className="text-xs font-medium">Settings</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Performance Metrics */}
+        <Card className="lg:col-span-2 border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">Performance</CardTitle>
+              <span className="text-xs text-gray-500">Last 7 days</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Stream Health</span>
+                  <span className="text-xs font-medium text-green-600 dark:text-green-400">Excellent</span>
+                </div>
+                <div className="h-2 bg-gray-100 dark:bg-gray-900 rounded-full overflow-hidden">
+                  <div className="h-full w-[95%] bg-green-500 rounded-full" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Viewer Retention</span>
+                  <span className="text-xs font-medium text-gray-900 dark:text-white">74%</span>
+                </div>
+                <div className="h-2 bg-gray-100 dark:bg-gray-900 rounded-full overflow-hidden">
+                  <div className="h-full w-[74%] bg-blue-500 rounded-full" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Engagement Rate</span>
+                  <span className="text-xs font-medium text-gray-900 dark:text-white">68%</span>
+                </div>
+                <div className="h-2 bg-gray-100 dark:bg-gray-900 rounded-full overflow-hidden">
+                  <div className="h-full w-[68%] bg-indigo-500 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity - Minimal */}
+        <Card className="lg:col-span-2 border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">Activity</CardTitle>
+              <Activity className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="h-2 w-2 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    Stream started: Marketing Webinar
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">30 minutes ago</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-2 w-2 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    New subscriber joined Premium
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-2 w-2 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    Event scheduled for tomorrow
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">4 hours ago</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
