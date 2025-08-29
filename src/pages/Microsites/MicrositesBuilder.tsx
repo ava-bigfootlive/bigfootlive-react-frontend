@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -304,14 +305,14 @@ export const MicrositesBuilder: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Microsite Builder</h1>
-          <p className="text-muted-foreground">Create custom landing pages for your events</p>
-        </div>
-        <div className="flex gap-2">
+    <DashboardLayout
+      title="Microsite Builder"
+      subtitle="Create custom landing pages for your events"
+    >
+      <div className="space-y-6">
+        {/* Header Actions */}
+        <div className="flex justify-end">
+          <div className="flex gap-2">
           <Button variant="outline" onClick={() => setShowCodeExport(true)}>
             <Code className="h-4 w-4 mr-2" />
             Export Code
@@ -799,7 +800,8 @@ export const MicrositesBuilder: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

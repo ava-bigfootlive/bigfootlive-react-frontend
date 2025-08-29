@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -281,20 +282,18 @@ export const WhiteLabelConfig: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            White Label Configuration
-            <Badge variant="secondary">
-              <Crown className="h-3 w-3 mr-1" />
-              Enterprise
-            </Badge>
-          </h1>
-          <p className="text-muted-foreground">Customize your platform branding and features</p>
-        </div>
-        <div className="flex gap-2">
+    <DashboardLayout
+      title="White Label Configuration"
+      subtitle="Customize your platform branding and features"
+    >
+      <div className="space-y-6">
+        {/* Header Actions */}
+        <div className="flex justify-between items-center">
+          <Badge variant="secondary">
+            <Crown className="h-3 w-3 mr-1" />
+            Enterprise
+          </Badge>
+          <div className="flex gap-2">
           <input
             type="file"
             accept=".json"
@@ -1183,7 +1182,8 @@ export const WhiteLabelConfig: React.FC = () => {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

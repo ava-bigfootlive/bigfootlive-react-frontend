@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -302,21 +303,21 @@ export const NotificationCenter: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            Notification Center
+    <DashboardLayout
+      title="Notification Center"
+      subtitle="Manage your notifications and preferences"
+    >
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
             {unreadCount > 0 && (
-              <Badge variant="destructive" className="ml-2">
-                {unreadCount}
+              <Badge variant="destructive">
+                {unreadCount} unread
               </Badge>
             )}
-          </h1>
-          <p className="text-muted-foreground">Manage your notifications and preferences</p>
-        </div>
-        <div className="flex gap-2">
+          </div>
+          <div className="flex gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -726,7 +727,8 @@ export const NotificationCenter: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

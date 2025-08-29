@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -268,12 +269,12 @@ const HelpCenter = () => {
   );
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Help Center</h1>
-          <p className="text-gray-600 mt-1">Get the support you need</p>
-        </div>
+    <DashboardLayout
+      title="Help Center"
+      subtitle="Get the support you need"
+    >
+      <div className="space-y-6">
+        <div className="flex justify-end">
         <Dialog open={isCreateTicketOpen} onOpenChange={setIsCreateTicketOpen}>
           <DialogTrigger asChild>
             <Button className="bg-violet-600 hover:bg-violet-700">
@@ -662,7 +663,8 @@ const HelpCenter = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
