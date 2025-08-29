@@ -27,7 +27,9 @@ import {
   FileText,
   Palette,
   Bell,
-  HelpCircle
+  HelpCircle,
+  Heart,
+  SmilePlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -154,7 +156,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       items: [
         { path: '/chat', label: 'Live Chat', icon: MessageSquare },
         { path: '/polls', label: 'Polls & Q&A', icon: Users },
-        { path: '/reactions', label: 'Reactions', icon: PlayCircle },
+        { path: '/reactions', label: 'Reactions', icon: Heart },
       ]
     },
     {
