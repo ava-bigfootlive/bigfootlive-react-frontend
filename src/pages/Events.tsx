@@ -94,78 +94,76 @@ export function EventsPage() {
               </Button>
             </DrawerTrigger>
             <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
-                <DrawerHeader>
-                  <DrawerTitle>Create New Event</DrawerTitle>
-                  <DrawerDescription>
-                    Set up your streaming event details
-                  </DrawerDescription>
-                </DrawerHeader>
-                
-                <div className="p-4 pb-0 space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Event Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter event title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Describe your event"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="start">Start Time</Label>
-                      <Input
-                        id="start"
-                        type="datetime-local"
-                        value={formData.scheduledStart}
-                        onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="end">End Time</Label>
-                      <Input
-                        id="end"
-                        type="datetime-local"
-                        value={formData.scheduledEnd}
-                        onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
-                      />
-                    </div>
-                  </div>
+              <DrawerHeader>
+                <DrawerTitle>Create New Event</DrawerTitle>
+                <DrawerDescription>
+                  Set up your streaming event details
+                </DrawerDescription>
+              </DrawerHeader>
+              
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Event Title</Label>
+                  <Input
+                    id="title"
+                    placeholder="Enter event title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  />
                 </div>
                 
-                <DrawerFooter>
-                  <Button 
-                    onClick={() => {
-                      toast.success('Event created successfully!');
-                      setOpen(false);
-                      setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
-                      loadEvents();
-                    }} 
-                    className="w-full bg-[#ab4aba] text-white hover:bg-[#973aa8]"
-                  >
-                    Create Event
-                  </Button>
-                  <DrawerClose asChild>
-                    <Button variant="outline" className="w-full">
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                </DrawerFooter>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe your event"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="start">Start Time</Label>
+                    <Input
+                      id="start"
+                      type="datetime-local"
+                      value={formData.scheduledStart}
+                      onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="end">End Time</Label>
+                    <Input
+                      id="end"
+                      type="datetime-local"
+                      value={formData.scheduledEnd}
+                      onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
+                    />
+                  </div>
+                </div>
               </div>
+              
+              <DrawerFooter>
+                <Button 
+                  onClick={() => {
+                    toast.success('Event created successfully!');
+                    setOpen(false);
+                    setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
+                    loadEvents();
+                  }} 
+                  className="w-full bg-[#ab4aba] text-white hover:bg-[#973aa8]"
+                >
+                  Create Event
+                </Button>
+                <DrawerClose asChild>
+                  <Button variant="outline" className="w-full">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
             </DrawerContent>
           </Drawer>
         </div>

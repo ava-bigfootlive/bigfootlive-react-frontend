@@ -58,8 +58,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
+// import data from '@emoji-mart/data';
+// import Picker from '@emoji-mart/react';
 
 interface Message {
   id: string;
@@ -759,21 +759,15 @@ const LiveChat: React.FC<LiveChatProps> = ({
         {/* Input Area */}
         <div className="p-4 border-t">
           <div className="flex items-center gap-2">
-            {/* Emoji Picker */}
-            <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Smile className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <Picker
-                  data={data}
-                  onEmojiSelect={handleEmojiSelect}
-                  theme="light"
-                />
-              </PopoverContent>
-            </Popover>
+            {/* Emoji Picker - Temporarily disabled */}
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => handleEmojiSelect({ native: '😊' })}
+              title="Add emoji"
+            >
+              <Smile className="h-4 w-4" />
+            </Button>
 
             {/* Mention Button */}
             <Popover open={showMentions} onOpenChange={setShowMentions}>

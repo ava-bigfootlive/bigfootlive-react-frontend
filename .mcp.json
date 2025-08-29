@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "react-mcp": {
+      "command": "node",
+      "args": [
+        "/home/ava-io/repos/react-mcp/index.js"
+      ],
+      "env": {
+        "PROJECT_PATH": "/home/ava-io/repos/bigfootlive-react-frontend"
+      }
+    },
+    "aws-api": {
+      "command": "uvx",
+      "args": [
+        "awslabs.aws-api-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_REGION": "us-west-1"
+      },
+      "timeout": 60000
+    },
+    "aws-ecs": {
+      "command": "uvx",
+      "args": [
+        "awslabs.ecs-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_REGION": "us-west-1"
+      },
+      "timeout": 60000
+    },
+    "aws-s3-tables": {
+      "command": "uvx",
+      "args": [
+        "awslabs.s3-tables-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_REGION": "us-west-1"
+      },
+      "timeout": 60000
+    }
+  }
+}
