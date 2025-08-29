@@ -181,13 +181,14 @@ class ApiClient {
           retryConfig.attempt++;
           const delay = retryConfig.delay * Math.pow(2, retryConfig.attempt - 1);
           
-          if (!skipErrorHandler) {
-            toast({
-              title: 'Retrying...',
-              description: `Attempt ${retryConfig.attempt} of ${retryConfig.retries}`,
-              variant: 'default'
-            });
-          }
+          // Don't show retry toasts - too noisy
+          // if (!skipErrorHandler) {
+          //   toast({
+          //     title: 'Retrying...',
+          //     description: `Attempt ${retryConfig.attempt} of ${retryConfig.retries}`,
+          //     variant: 'default'
+          //   });
+          // }
 
           await new Promise(resolve => setTimeout(resolve, delay));
           return this.requestWithRetry<T>(
@@ -202,7 +203,10 @@ class ApiClient {
 
         // Handle error if not retrying
         if (!skipErrorHandler) {
-          errorHandler.handle(appError, `API Request: ${endpoint}`);
+          // Only show error for non-404/405 errors to reduce noise
+          if (response.status !== 404 && response.status !== 405) {
+            errorHandler.handle(appError, `API Request: ${endpoint}`);
+          }
         }
         
         throw appError;

@@ -112,8 +112,11 @@ class GlobalErrorHandler {
       this.config = { ...this.config, ...config };
     }
     
-    // By default, suppress WebSocket errors after initial notification
+    // By default, suppress noisy error types to avoid toast spam
     this.suppressedErrorTypes.add(ErrorType.WEBSOCKET);
+    this.suppressedErrorTypes.add(ErrorType.AUTH);
+    this.suppressedErrorTypes.add(ErrorType.API);
+    this.suppressedErrorTypes.add(ErrorType.NOT_FOUND);
   }
 
   // Parse error from various sources
