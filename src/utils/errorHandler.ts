@@ -253,7 +253,7 @@ class GlobalErrorHandler {
     
     // Suppress 404/405 errors - these are expected when backend is down
     if (appError.statusCode === 404 || appError.statusCode === 405) {
-      console.log('Expected error (404/405):', appError.message);
+      // Silently handle these errors - no console output
       return appError;
     }
 
