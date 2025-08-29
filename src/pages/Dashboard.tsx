@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { MCPDemo } from '@/components/Demo/MCPDemo';
 import { 
   Radio,
   Calendar,
@@ -178,6 +179,14 @@ export default function DashboardPage() {
               <Clock className="h-8 w-8 text-gray-300 dark:text-gray-700" />
             </div>
           </div>
+        </div>
+
+        {/* MCP Demo Section */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Development Tools
+          </h3>
+          <MCPDemo />
         </div>
       </div>
     </div>

@@ -45,6 +45,46 @@
         "AWS_REGION": "us-west-1"
       },
       "timeout": 60000
+    },
+    "terraform": {
+      "command": "/home/ava-io/repos/terraform-mcp-server/bin/terraform-mcp-server",
+      "args": [
+        "stdio"
+      ],
+      "timeout": 60000
+    },
+    "playwright": {
+      "command": "node",
+      "args": [
+        "/home/ava-io/repos/playwright-mcp/index.js"
+      ],
+      "timeout": 60000
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@github/mcp-server@latest"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "timeout": 60000
+    },
+    "k6": {
+      "command": "uvx",
+      "args": [
+        "k6-mcp-server@latest"
+      ],
+      "timeout": 60000
+    },
+    "ffmpeg": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-ffmpeg@latest"
+      ],
+      "timeout": 60000
     }
   }
 }
