@@ -20,7 +20,6 @@ import {
   PlayCircle,
   Wifi,
   Monitor,
-  DollarSign,
   Globe,
   MessageSquare,
   ChevronDown,
@@ -100,17 +99,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         { path: '/playlists', label: 'Playlists', icon: FileText },
         { path: '/asset-manager', label: 'Asset Manager', icon: Upload },
         { path: '/content-scheduler', label: 'Scheduler', icon: Calendar },
-      ]
-    },
-    {
-      id: 'monetization',
-      title: 'Monetization',
-      icon: DollarSign,
-      collapsible: true,
-      items: [
-        { path: '/subscriptions', label: 'Subscriptions', icon: Users },
-        { path: '/pay-per-view', label: 'Pay-Per-View', icon: DollarSign },
-        { path: '/revenue-analytics', label: 'Revenue', icon: BarChart3 },
       ]
     },
     {

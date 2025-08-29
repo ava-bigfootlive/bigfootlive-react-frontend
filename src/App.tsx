@@ -47,9 +47,7 @@ import VODLibrary from './pages/CMS/VODLibrary';
 import AssetManager from './pages/CMS/AssetManager';
 import ContentScheduler from './pages/CMS/ContentScheduler';
 import AnalyticsDashboard from './pages/Analytics/AnalyticsDashboard';
-import SubscriptionManager from './pages/Monetization/SubscriptionManager';
-import PayPerView from './pages/Monetization/PayPerView';
-import RevenueAnalytics from './pages/Monetization/RevenueAnalytics';
+// Monetization components removed per user request
 import EnhancedVideoPlayer from './components/VideoPlayer/EnhancedVideoPlayer';
 import LiveChat from './components/Interactive/LiveChat';
 import ReactionsOverlay from './components/Interactive/ReactionsOverlay';
@@ -402,32 +400,7 @@ function App() {
             }
           />
 
-          <Route
-            path="/subscription-manager"
-            element={
-              <ProtectedRoute>
-                <SubscriptionManager />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/pay-per-view"
-            element={
-              <ProtectedRoute>
-                <PayPerView />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/revenue-analytics"
-            element={
-              <ProtectedRoute>
-                <RevenueAnalytics />
-              </ProtectedRoute>
-            }
-          />
+          {/* Monetization routes removed per user request */}
 
           <Route
             path="/notifications"
