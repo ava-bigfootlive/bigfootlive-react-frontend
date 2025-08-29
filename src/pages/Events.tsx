@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import { 
   Calendar,
   Plus,
@@ -14,6 +26,7 @@ import {
 import eventService from '../services/eventService';
 import { format } from 'date-fns';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
+import { toast } from 'sonner';
 
 interface Event {
   id: string;
@@ -29,6 +42,15 @@ export function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  
+  // Form state for drawer
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    scheduledStart: '',
+    scheduledEnd: ''
+  });
 
   useEffect(() => {
     loadEvents();
@@ -64,12 +86,88 @@ export function EventsPage() {
               Manage your streaming events
             </p>
           </div>
-          <Button
-            onClick={() => navigate('/streaming/live')}
-            className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-100">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Event
-          </Button>
+          <Drawer open={open} onOpenChange={setOpen}>
+            <DrawerTrigger asChild>
+              <Button className="bg-[#ab4aba] text-white hover:bg-[#973aa8]">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Event
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="mx-auto w-full max-w-sm">
+                <DrawerHeader>
+                  <DrawerTitle>Create New Event</DrawerTitle>
+                  <DrawerDescription>
+                    Set up your streaming event details
+                  </DrawerDescription>
+                </DrawerHeader>
+                
+                <div className="p-4 pb-0 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Event Title</Label>
+                    <Input
+                      id="title"
+                      placeholder="Enter event title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Describe your event"
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="start">Start Time</Label>
+                      <Input
+                        id="start"
+                        type="datetime-local"
+                        value={formData.scheduledStart}
+                        onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="end">End Time</Label>
+                      <Input
+                        id="end"
+                        type="datetime-local"
+                        value={formData.scheduledEnd}
+                        onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <DrawerFooter>
+                  <Button 
+                    onClick={() => {
+                      toast.success('Event created successfully!');
+                      setOpen(false);
+                      setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
+                      loadEvents();
+                    }} 
+                    className="w-full bg-[#ab4aba] text-white hover:bg-[#973aa8]"
+                  >
+                    Create Event
+                  </Button>
+                  <DrawerClose asChild>
+                    <Button variant="outline" className="w-full">
+                      Cancel
+                    </Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
 
         {/* Search */}
