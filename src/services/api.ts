@@ -277,7 +277,8 @@ class ApiClient {
       if (endpoint.match(/\/events\/[^/]+$/)) {
         return null;
       }
-      return [];
+      // Return the expected structure for listEvents
+      return { items: [], total: 0 };
     }
     
     // Users endpoints

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState, useEffect } from 'react';
 import {
   Home,
   Upload,
@@ -37,7 +38,6 @@ import {
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -62,7 +62,22 @@ interface NavItem {
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['main']);
+  
+  // Initialize expanded sections from localStorage or with defaults
+  const [expandedSections, setExpandedSections] = useState<string[]>(() => {
+    const saved = localStorage.getItem('sidebarExpandedSections');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    // Default to all sections expanded for better UX
+    return ['main', 'streaming', 'content', 'management', 'analytics', 'platform', 'admin'];
+  });
+
+  // Save expanded sections to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+  }, [expandedSections]);
+
 
   const handleSignOut = async () => {
     try {
@@ -158,6 +173,17 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
   const isAdmin = user?.['custom:role'] === 'admin' || user?.['custom:role'] === 'superadmin';
   const allSections = isAdmin ? [...navSections, ...adminSections] : navSections;
+
+  // Auto-expand section containing current route
+  useEffect(() => {
+    for (const section of allSections) {
+      const hasActivePath = section.items.some(item => location.pathname === item.path);
+      if (hasActivePath && !expandedSections.includes(section.title.toLowerCase())) {
+        setExpandedSections(prev => [...prev, section.title.toLowerCase()]);
+        break;
+      }
+    }
+  }, [location.pathname]);
 
   const renderNavItem = (item: NavItem, depth: number = 0) => {
     const isActive = location.pathname === item.path;
