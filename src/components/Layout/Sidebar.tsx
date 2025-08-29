@@ -116,7 +116,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       id: 'main',
       title: 'Main',
       items: [
-        { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/events', label: 'Events', icon: Calendar },
         { path: '/analytics', label: 'Analytics', icon: BarChart3 },
       ]
@@ -213,19 +212,19 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
       {/* Sidebar */}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 transform bg-white transition-transform duration-300 ease-out',
-        'dark:bg-gray-950 border-r border-gray-100 dark:border-gray-900',
+        'fixed inset-y-0 left-0 z-50 w-64 transform bg-background transition-transform duration-300 ease-out',
+        'border-r border-border',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         'lg:translate-x-0'
       )}>
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex h-16 items-center justify-between px-5 border-b border-gray-100 dark:border-gray-900">
+          <div className="flex h-16 items-center justify-between px-5 border-b border-border">
             <Link to="/dashboard" className="flex items-center space-x-2.5">
-              <div className="h-8 w-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
-                <Radio className="h-4 w-4 text-white dark:text-black" />
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <Radio className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              <span className="text-lg font-semibold text-foreground">
                 BigfootLive
               </span>
             </Link>
@@ -240,18 +239,18 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           </div>
 
           {/* Quick Action */}
-          <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-900">
+          <div className="px-4 py-4 border-b border-border">
             <Link
-              to="/streaming/live"
+              to="/dashboard"
               className={cn(
                 "w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2.5",
-                "bg-black dark:bg-white text-white dark:text-black",
-                "hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors duration-200",
+                "bg-foreground text-background",
+                "hover:opacity-90 transition-opacity duration-200",
                 "font-medium text-sm"
               )}
             >
-              <Radio className="h-3.5 w-3.5" />
-              <span>Go Live</span>
+              <Home className="h-3.5 w-3.5" />
+              <span>Dashboard</span>
             </Link>
           </div>
 
@@ -270,8 +269,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           onClick={() => toggleSection(section.id)}
                           className={cn(
                             "w-full flex items-center justify-between px-3 py-2 rounded-lg",
-                            "text-sm font-medium text-gray-600 dark:text-gray-400",
-                            "hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
+                            "text-sm font-medium text-muted-foreground",
+                            "hover:bg-accent hover:text-accent-foreground transition-colors"
                           )}
                         >
                           <div className="flex items-center gap-2">
@@ -296,14 +295,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                                   className={cn(
                                     "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors duration-200",
                                     isActive
-                                      ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-                                      : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                                      ? "bg-accent text-accent-foreground font-medium"
+                                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                                   )}
                                 >
                                   <Icon className="h-3.5 w-3.5 flex-shrink-0" />
                                   <span className="text-sm">{item.label}</span>
                                   {item.badge && (
-                                    <span className="ml-auto text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded">
+                                    <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
                                       {item.badge}
                                     </span>
                                   )}
@@ -325,8 +324,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                             className={cn(
                               "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
                               isActive
-                                ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-                                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                                ? "bg-accent text-accent-foreground font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                             )}
                           >
                             <Icon className="h-4 w-4 flex-shrink-0" />
@@ -341,14 +340,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             </div>
 
             {/* Bottom Links */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 space-y-1">
+            <div className="mt-6 pt-6 border-t border-border space-y-1">
               <Link
                 to="/settings"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
                   isPathActive('/settings')
-                    ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-                    : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
               >
                 <Settings className="h-4 w-4" />
@@ -359,8 +358,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
                   isPathActive('/notifications')
-                    ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-                    : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
               >
                 <Bell className="h-4 w-4" />
@@ -371,8 +370,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200",
                   isPathActive('/help')
-                    ? "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-                    : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
               >
                 <HelpCircle className="h-4 w-4" />
@@ -382,16 +381,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           </nav>
 
           {/* User Section */}
-          <div className="border-t border-gray-100 dark:border-gray-900 p-4">
+          <div className="border-t border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-                <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                <User className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.given_name || user?.email?.split('@')[0] || 'User'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {user?.['custom:role'] || 'Member'}
                 </p>
               </div>
@@ -399,7 +398,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mr-2"
+                className="text-muted-foreground hover:text-foreground -mr-2"
               >
                 <LogOut className="h-4 w-4" />
               </Button>

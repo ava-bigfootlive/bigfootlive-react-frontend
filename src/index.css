@@ -77,7 +77,7 @@
     
     /* Dark muted */
     --muted: 240 10% 15%; /* dark gray */
-    --muted-foreground: 240 5% 64.9%; /* light gray */
+    --muted-foreground: 240 5% 75%; /* lighter gray for better contrast */
     
     /* Dark accent */
     --accent: 240 10% 15%; /* dark gray */

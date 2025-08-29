@@ -132,8 +132,8 @@ class ApiClient {
             errorType = ErrorType.AUTH;
             severity = ErrorSeverity.ERROR;
             // Only redirect to login for certain endpoints
-            // Don't redirect for media/playlist endpoints that might just be missing
-            if (!endpoint.includes('/media') && !endpoint.includes('/playlist')) {
+            // Don't redirect for media/playlist/assets endpoints that might just be missing
+            if (!endpoint.includes('/media') && !endpoint.includes('/playlist') && !endpoint.includes('/assets')) {
               this.handleAuthError();
             }
             break;
@@ -649,7 +649,10 @@ class ApiClient {
   }
 
   async getUserMedia(page: number = 1, limit: number = 20): Promise<any> {
-    return this.request(`/api/v1/media/user/media?page=${page}&limit=${limit}`);
+    // Try the endpoint, but return empty data if it fails
+    return this.request(`/api/v1/media/user/media?page=${page}&limit=${limit}`, {
+      skipErrorHandler: false
+    }).catch(() => ({ items: [], total: 0 }));
   }
 
   async getMedia(mediaId: string): Promise<any> {
