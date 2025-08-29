@@ -446,7 +446,7 @@ class ApiClient {
 
   // Tenant endpoints
   async getTenants(): Promise<any> {
-    return this.request('/api/v1/tenants');
+    return this.request('/api/v1/tenants/');
   }
 
   async getTenant(id: string): Promise<any> {
@@ -454,7 +454,7 @@ class ApiClient {
   }
 
   async createTenant(data: any): Promise<any> {
-    return this.request('/api/v1/tenants', {
+    return this.request('/api/v1/tenants/', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -475,7 +475,7 @@ class ApiClient {
 
   // User management endpoints
   async getUsers(): Promise<any> {
-    return this.request('/api/v1/users');
+    return this.request('/api/v1/users/');
   }
 
   async getUser(id: string): Promise<any> {
@@ -483,7 +483,7 @@ class ApiClient {
   }
 
   async createUser(data: any): Promise<any> {
-    return this.request('/api/v1/users', {
+    return this.request('/api/v1/users/', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -504,7 +504,7 @@ class ApiClient {
 
   // Feature flags endpoints
   async getFeatureFlags(): Promise<any> {
-    return this.request('/api/v1/feature-flags');
+    return this.request('/api/v1/feature-flags/');
   }
 
   async getFeatureFlag(id: string): Promise<any> {
@@ -512,7 +512,7 @@ class ApiClient {
   }
 
   async createFeatureFlag(data: any): Promise<any> {
-    return this.request('/api/v1/feature-flags', {
+    return this.request('/api/v1/feature-flags/', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -533,7 +533,7 @@ class ApiClient {
 
   // Event endpoints
   async getEvents(): Promise<any> {
-    return this.request('/api/v1/events', {
+    return this.request('/api/v1/events/', {
       method: 'GET'
     });
   }
@@ -543,7 +543,7 @@ class ApiClient {
   }
 
   async createEvent(data: any): Promise<any> {
-    return this.request('/api/v1/events', {
+    return this.request('/api/v1/events/', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -565,7 +565,7 @@ class ApiClient {
 
   // Stream endpoints
   async getStreams(): Promise<any> {
-    return this.request('/api/v1/streams');
+    return this.request('/api/v1/streams/');
   }
 
   async getStream(id: string): Promise<any> {
