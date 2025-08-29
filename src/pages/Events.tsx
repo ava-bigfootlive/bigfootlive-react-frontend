@@ -231,8 +231,8 @@ export function EventsPage() {
               Create your first event to get started
             </p>
             <Button
-              onClick={() => navigate('/streaming/live')}
-              className="bg-black dark:bg-white text-white dark:text-black"
+              onClick={() => setOpen(true)}
+              className="bg-[#ab4aba] text-white hover:bg-[#973aa8]"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Event
