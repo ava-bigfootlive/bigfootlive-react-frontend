@@ -66,7 +66,7 @@ export interface EventContainer {
 }
 
 class EventService {
-  private baseUrl = '/api/v1/events';
+  private baseUrl = '/api/v1/events/';
   private containerUrl = '/api/v1/containers';
 
   /**
@@ -88,7 +88,7 @@ class EventService {
    * Get event details
    */
   async getEvent(eventId: string): Promise<LiveEvent> {
-    const response = await apiClient.get(`${this.baseUrl}/${eventId}`);
+    const response = await apiClient.get(`${this.baseUrl}${eventId}`);
     
     // Add streaming URLs
     if (response.stream_key) {
@@ -130,21 +130,21 @@ class EventService {
    * Start live event (spins up container)
    */
   async startEvent(eventId: string): Promise<EventContainer> {
-    return apiClient.post(`${this.baseUrl}/${eventId}/start`);
+    return apiClient.post(`${this.baseUrl}${eventId}/start`);
   }
 
   /**
    * Stop live event (stops container and archives)
    */
   async stopEvent(eventId: string): Promise<void> {
-    return apiClient.post(`${this.baseUrl}/${eventId}/stop`);
+    return apiClient.post(`${this.baseUrl}${eventId}/stop`);
   }
 
   /**
    * Get event statistics
    */
   async getEventStats(eventId: string): Promise<EventStats> {
-    return apiClient.get(`${this.baseUrl}/${eventId}/stats`);
+    return apiClient.get(`${this.baseUrl}${eventId}/stats`);
   }
 
   /**
@@ -158,14 +158,14 @@ class EventService {
    * Update event details
    */
   async updateEvent(eventId: string, data: Partial<CreateEventRequest>): Promise<LiveEvent> {
-    return apiClient.patch(`${this.baseUrl}/${eventId}`, data);
+    return apiClient.patch(`${this.baseUrl}${eventId}`, data);
   }
 
   /**
    * Delete/cancel event
    */
   async deleteEvent(eventId: string): Promise<void> {
-    return apiClient.delete(`${this.baseUrl}/${eventId}`);
+    return apiClient.delete(`${this.baseUrl}${eventId}`);
   }
 
   /**
@@ -225,7 +225,7 @@ class EventService {
    * Convert live event recording to VOD
    */
   async convertToVod(eventId: string): Promise<{ jobId: string; mediaId: string }> {
-    return apiClient.post(`${this.baseUrl}/${eventId}/convert-to-vod`);
+    return apiClient.post(`${this.baseUrl}${eventId}/convert-to-vod`);
   }
 }
 
