@@ -83,22 +83,29 @@ class ApiClient {
     try {
       const headers = await this.getHeaders(authenticated);
       
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        ...fetchOptions,
-        headers: {
-          ...headers,
-          ...fetchOptions.headers,
-        },
-        signal: controller.signal
-      });
+      let response: Response;
+      try {
+        response = await fetch(`${API_URL}${endpoint}`, {
+          ...fetchOptions,
+          headers: {
+            ...headers,
+            ...fetchOptions.headers,
+          },
+          signal: controller.signal
+        });
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError;
+      }
 
       clearTimeout(timeoutId);
 
       // Handle specific status codes
       if (!response.ok) {
         // For 404/405 errors, return empty data instead of throwing
+        // These are expected when backend endpoints don't exist yet
         if (response.status === 404 || response.status === 405) {
-          // Return appropriate empty response based on endpoint
+          // Don't log to console, just return empty response
           return this.getEmptyResponse(endpoint, fetchOptions.method || 'GET') as T;
         }
 
