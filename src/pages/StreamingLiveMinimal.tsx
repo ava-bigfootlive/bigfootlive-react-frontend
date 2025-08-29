@@ -10,7 +10,7 @@ import {
   Loader2,
   Settings
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { 
   Select, 
   SelectContent, 
@@ -92,20 +92,19 @@ export default function StreamingLivePage() {
   const streamKey = selectedEvent?.streamKey || 'stream_key_' + (selectedEvent?.id || 'demo');
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-800">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Go Live
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Start streaming your event
-                </p>
-              </div>
+    <DashboardLayout title="Go Live">
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Go Live
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Start streaming your event
+              </p>
+            </div>
 
               {/* Event Selector */}
               <Select 
@@ -171,14 +170,8 @@ export default function StreamingLivePage() {
                   </Button>
                 </>
               )}
-              <ThemeToggle />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6">
         {!selectedEvent ? (
           <div className="text-center py-24">
             <Radio className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-700 mb-4" />
@@ -313,6 +306,6 @@ export default function StreamingLivePage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

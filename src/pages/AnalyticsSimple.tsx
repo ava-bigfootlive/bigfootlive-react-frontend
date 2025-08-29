@@ -6,7 +6,7 @@ import {
   Clock,
   Eye
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { DashboardLayout } from '../components/Layout/DashboardLayout';
 
 export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
@@ -23,25 +23,7 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-800">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Analytics
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Performance metrics for your streams
-              </p>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
+    <DashboardLayout title="Analytics">
       <div className="p-6">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -73,6 +55,6 @@ export default function AnalyticsPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

@@ -12,7 +12,7 @@ import { networkMonitor } from './utils/networkMonitor';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
-import DashboardPage from './pages/DashboardEnhanced';
+import DashboardPage from './pages/DashboardMinimal';
 import VODUploadPage from './pages/VODUpload';
 import StreamingLivePage from './pages/StreamingLiveMinimal';
 import PlatformAdminPage from './pages/PlatformAdmin';
@@ -477,3 +477,4 @@ function App() {
 }
 
 export default App;// Build timestamp: $(date)
+// Build timestamp: Thu Aug 28 08:45:33 PM PDT 2025
