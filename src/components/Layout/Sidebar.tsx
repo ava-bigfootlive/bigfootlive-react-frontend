@@ -180,7 +180,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 <Radio className="h-4 w-4 text-white dark:text-black" />
               </div>
               <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                BigFoot
+                BigfootLive
               </span>
             </Link>
             <Button

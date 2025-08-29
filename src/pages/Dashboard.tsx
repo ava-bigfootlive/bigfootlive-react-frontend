@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { 
   Radio,
   Users, 
@@ -53,13 +54,16 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 p-6 lg:p-8 max-w-[1400px] mx-auto">
       {/* Minimal Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-          Welcome back{user?.given_name ? `, ${user.given_name}` : ''}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Here's what's happening with your streams today
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Welcome back{user?.given_name ? `, ${user.given_name}` : ''}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Here's what's happening with your streams today
+          </p>
+        </div>
+        <ThemeToggle />
       </div>
 
       {/* Bento Grid Layout */}
