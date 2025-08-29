@@ -109,9 +109,12 @@ class ApiClient {
 
       // Handle specific status codes
       if (!response.ok) {
-        // For 404/405 errors, return empty data instead of throwing
-        // These are expected when backend endpoints don't exist yet
-        if (response.status === 404 || response.status === 405) {
+        // For 404/405/401 errors on certain endpoints, return empty data instead of throwing
+        // These are expected when backend endpoints don't exist yet or auth is missing
+        if (response.status === 404 || response.status === 405 || 
+            (response.status === 401 && (endpoint.includes('/events') || 
+                                         endpoint.includes('/media') || 
+                                         endpoint.includes('/playlist')))) {
           // Record this error to prevent future attempts
           apiHealth.recordError(endpoint, response.status);
           // Don't log to console, just return empty response
@@ -132,8 +135,11 @@ class ApiClient {
             errorType = ErrorType.AUTH;
             severity = ErrorSeverity.ERROR;
             // Only redirect to login for certain endpoints
-            // Don't redirect for media/playlist/assets endpoints that might just be missing
-            if (!endpoint.includes('/media') && !endpoint.includes('/playlist') && !endpoint.includes('/assets')) {
+            // Don't redirect for endpoints that might just be missing or have auth issues
+            if (!endpoint.includes('/media') && 
+                !endpoint.includes('/playlist') && 
+                !endpoint.includes('/assets') && 
+                !endpoint.includes('/events')) {
               this.handleAuthError();
             }
             break;
