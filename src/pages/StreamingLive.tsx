@@ -206,8 +206,10 @@ export default function StreamingLivePage() {
 
   const loadEvents = async () => {
     try {
-      const events = await api.getEvents();
-      setState(prev => ({ ...prev, events: events || [] }));
+      const response = await api.getEvents();
+      // Handle both array and object with items property
+      const events = Array.isArray(response) ? response : (response?.items || []);
+      setState(prev => ({ ...prev, events: events }));
       
       // If coming from streaming page with eventId, select that event
       if (location.state?.eventId) {

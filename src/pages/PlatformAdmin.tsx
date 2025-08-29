@@ -74,7 +74,9 @@ export default function PlatformAdminPage() {
 
       // Count active events as active streams
       if (eventsData.status === 'fulfilled' && eventsData.value) {
-        const activeEvents = eventsData.value.filter((event: any) => 
+        // Handle both array and object with items property
+        const events = Array.isArray(eventsData.value) ? eventsData.value : (eventsData.value?.items || []);
+        const activeEvents = events.filter((event: any) => 
           event.status === 'live' || event.status === 'streaming'
         );
         stats.activeStreams = activeEvents.length;

@@ -105,7 +105,8 @@ export default function AnalyticsPage() {
     try {
       setLoading(true);
       const response = await api.getEvents();
-      const eventList = Array.isArray(response) ? response : [];
+      // Handle both array and object with items property
+      const eventList = Array.isArray(response) ? response : (response?.items || []);
       setEvents(eventList);
       
       // Auto-select first event if available

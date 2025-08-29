@@ -151,9 +151,11 @@ export default function EventManagement() {
     try {
       setLoading(true);
       const response = await api.getEvents();
+      // Handle both array and object with items property
+      const eventsData = Array.isArray(response) ? response : (response?.items || []);
       
       // Generate demo events if none exist
-      const demoEvents: Event[] = response.length > 0 ? response : [
+      const demoEvents: Event[] = eventsData.length > 0 ? eventsData : [
         {
           id: 'evt-1',
           title: 'Q1 2024 Product Launch',

@@ -79,7 +79,8 @@ export default function DashboardEnhanced() {
     try {
       setLoading(true);
       const eventsResponse = await api.getEvents();
-      const events = Array.isArray(eventsResponse) ? eventsResponse : [];
+      // Handle both array and object with items property
+      const events = Array.isArray(eventsResponse) ? eventsResponse : (eventsResponse?.items || []);
       
       const activeStreams = events.filter((e: any) => e.status === 'live').length;
       const upcomingEvents = events.filter((e: any) => e.status === 'scheduled' || e.status === 'upcoming').length;
