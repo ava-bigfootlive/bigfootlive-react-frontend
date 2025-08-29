@@ -48,6 +48,9 @@ import AssetManager from './pages/CMS/AssetManager';
 import ContentScheduler from './pages/CMS/ContentScheduler';
 import AnalyticsDashboard from './pages/Analytics/AnalyticsDashboard';
 // Monetization components removed per user request
+
+// Test Pages
+import ThemeTest from './pages/ThemeTest';
 import EnhancedVideoPlayer from './components/VideoPlayer/EnhancedVideoPlayer';
 import LiveChat from './components/Interactive/LiveChat';
 import ReactionsOverlay from './components/Interactive/ReactionsOverlay';
@@ -62,6 +65,7 @@ import ReactionsPage from './pages/Reactions';
 import UserManagement from './pages/Users/UserManagement';
 import Settings from './pages/Settings/Settings';
 import HelpCenter from './pages/Help/HelpCenter';
+import UIComponentTest from './pages/UIComponentTest';
 
 function App() {
   // Setup global error handlers
@@ -119,6 +123,7 @@ function App() {
           <Route path="/404" element={<NotFound />} />
           <Route path="/500" element={<ServerError />} />
           <Route path="/403" element={<Forbidden />} />
+          <Route path="/theme-test" element={<ThemeTest />} />
           
           {/* Protected Routes */}
           <Route
@@ -481,6 +486,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <HelpCenter />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* UI Component Test Page */}
+          <Route
+            path="/ui-test"
+            element={
+              <ProtectedRoute>
+                <UIComponentTest />
               </ProtectedRoute>
             }
           />

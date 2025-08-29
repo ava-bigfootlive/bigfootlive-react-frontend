@@ -28,6 +28,7 @@ import {
   Palette,
   Bell,
   HelpCircle,
+  Puzzle,
   Heart,
   SmilePlus
 } from 'lucide-react';
@@ -167,7 +168,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       items: [
         { path: '/white-label', label: 'White Label', icon: Palette },
         { path: '/microsites', label: 'Microsites', icon: Globe },
-        { path: '/integrations', label: 'Integrations', icon: Globe },
+        { path: '/integrations', label: 'Integrations', icon: Puzzle },
         { path: '/embed-generator', label: 'Embed', icon: FileText },
       ]
     }
@@ -246,7 +247,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               to="/dashboard"
               className={cn(
                 "w-full flex items-center justify-center gap-2.5 rounded-lg px-4 py-3",
-                "bg-[#ab4aba] text-white",
+                "bg-primary text-primary-foreground",
                 "hover:bg-[#973aa8] transition-all duration-200",
                 "font-semibold text-sm",
                 "shadow-sm hover:shadow-md",

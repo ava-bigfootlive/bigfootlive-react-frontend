@@ -56,40 +56,40 @@
 
   .dark {
     /* Dark mode background colors */
-    --background: 240 10% 3.9%; /* very dark gray */
-    --foreground: 0 0% 98%; /* almost white */
+    --background: 222 47% 11%; /* slate-900 equivalent */
+    --foreground: 210 40% 98%; /* slate-50 equivalent */
     
     /* Dark card backgrounds */
-    --card: 240 10% 7%; /* dark gray */
-    --card-foreground: 0 0% 98%; /* almost white */
+    --card: 215 25% 15%; /* darker slate for better contrast against background */
+    --card-foreground: 210 40% 98%; /* slate-50 equivalent */
     
     /* Dark popover backgrounds */
-    --popover: 240 10% 7%; /* dark gray */
-    --popover-foreground: 0 0% 98%; /* almost white */
+    --popover: 215 25% 15%; /* darker slate for better contrast */
+    --popover-foreground: 210 40% 98%; /* slate-50 equivalent */
     
     /* Dark primary - purple */
     --primary: 280 65% 60%; /* purple */
     --primary-foreground: 0 0% 100%; /* white */
     
     /* Dark secondary */
-    --secondary: 240 10% 15%; /* dark gray */
-    --secondary-foreground: 0 0% 98%; /* almost white */
+    --secondary: 217 33% 20%; /* slate-700 equivalent */
+    --secondary-foreground: 210 40% 98%; /* slate-50 equivalent */
     
     /* Dark muted */
-    --muted: 240 10% 15%; /* dark gray */
-    --muted-foreground: 240 5% 75%; /* lighter gray for better contrast */
+    --muted: 215 25% 27%; /* slate-700 equivalent */
+    --muted-foreground: 215 20% 65%; /* slate-400 equivalent for better contrast */
     
     /* Dark accent */
-    --accent: 240 10% 15%; /* dark gray */
-    --accent-foreground: 0 0% 98%; /* almost white */
+    --accent: 217 33% 20%; /* slate-700 equivalent */
+    --accent-foreground: 210 40% 98%; /* slate-50 equivalent */
     
     /* Destructive remains same */
     --destructive: 0 62.8% 30.6%; /* dark red */
     --destructive-foreground: 0 0% 98%; /* white */
     
     /* Dark borders */
-    --border: 240 10% 20%; /* dark gray border */
-    --input: 240 10% 20%; /* dark gray border */
+    --border: 215 20% 25%; /* slate-700 border for better visibility */
+    --input: 215 20% 25%; /* slate-700 border for better visibility */
     --ring: 280 65% 60%; /* purple */
     
     /* Chart colors */

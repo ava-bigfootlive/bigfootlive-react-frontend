@@ -5,15 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { 
   Calendar,
   Plus,
@@ -104,80 +103,76 @@ export function EventsWithDrawerPage() {
             </p>
           </div>
           
-          <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
               <Button className="bg-foreground text-background hover:opacity-90">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Event
               </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
-                <DrawerHeader>
-                  <DrawerTitle>Create New Event</DrawerTitle>
-                  <DrawerDescription>
-                    Set up your streaming event details
-                  </DrawerDescription>
-                </DrawerHeader>
-                
-                <div className="p-4 pb-0 space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Event Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter event title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Describe your event"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="start">Start Time</Label>
-                      <Input
-                        id="start"
-                        type="datetime-local"
-                        value={formData.scheduledStart}
-                        onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="end">End Time</Label>
-                      <Input
-                        id="end"
-                        type="datetime-local"
-                        value={formData.scheduledEnd}
-                        onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
-                      />
-                    </div>
-                  </div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Create New Event</DialogTitle>
+                <DialogDescription>
+                  Set up your streaming event details
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Event Title</Label>
+                  <Input
+                    id="title"
+                    placeholder="Enter event title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  />
                 </div>
                 
-                <DrawerFooter>
-                  <Button onClick={handleCreateEvent} className="w-full">
-                    Create Event
-                  </Button>
-                  <DrawerClose asChild>
-                    <Button variant="outline" className="w-full">
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                </DrawerFooter>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe your event"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="start">Start Time</Label>
+                    <Input
+                      id="start"
+                      type="datetime-local"
+                      value={formData.scheduledStart}
+                      onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="end">End Time</Label>
+                    <Input
+                      id="end"
+                      type="datetime-local"
+                      value={formData.scheduledEnd}
+                      onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
+                    />
+                  </div>
+                </div>
               </div>
-            </DrawerContent>
-          </Drawer>
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateEvent}>
+                  Create Event
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Search */}

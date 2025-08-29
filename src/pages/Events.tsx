@@ -5,15 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { 
   Calendar,
   Plus,
@@ -43,6 +42,7 @@ export function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   
   // Form state for drawer
   const [formData, setFormData] = useState({
@@ -63,6 +63,9 @@ export function EventsPage() {
       const eventsData = response.items || [];
       setEvents(eventsData);
     } catch (err) {
+      console.error('Failed to load events:', err);
+      // Show a user-friendly message instead of silently failing
+      toast.error('Unable to load events. Please try refreshing the page.');
       setEvents([]);
     } finally {
       setLoading(false);
@@ -86,22 +89,22 @@ export function EventsPage() {
               Manage your streaming events
             </p>
           </div>
-          <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>
-              <Button className="bg-[#ab4aba] text-white hover:bg-[#973aa8]">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Event
               </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Create New Event</DrawerTitle>
-                <DrawerDescription>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Create New Event</DialogTitle>
+                <DialogDescription>
                   Set up your streaming event details
-                </DrawerDescription>
-              </DrawerHeader>
+                </DialogDescription>
+              </DialogHeader>
               
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Event Title</Label>
                   <Input
@@ -146,26 +149,49 @@ export function EventsPage() {
                 </div>
               </div>
               
-              <DrawerFooter>
-                <Button 
-                  onClick={() => {
-                    toast.success('Event created successfully!');
-                    setOpen(false);
-                    setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
-                    loadEvents();
-                  }} 
-                  className="w-full bg-[#ab4aba] text-white hover:bg-[#973aa8]"
-                >
-                  Create Event
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
                 </Button>
-                <DrawerClose asChild>
-                  <Button variant="outline" className="w-full">
-                    Cancel
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+                <Button 
+                  onClick={async () => {
+                    try {
+                      // Validate required fields
+                      if (!formData.title.trim()) {
+                        toast.error('Event title is required');
+                        return;
+                      }
+
+                      setCreating(true);
+
+                      // Create the event via API
+                      await eventService.createEvent({
+                        title: formData.title,
+                        description: formData.description,
+                        scheduled_start: formData.scheduledStart,
+                        recording_enabled: true,
+                        chat_enabled: true
+                      });
+
+                      toast.success('Event created successfully!');
+                      setOpen(false);
+                      setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
+                      await loadEvents(); // Reload the events list
+                    } catch (error) {
+                      console.error('Failed to create event:', error);
+                      toast.error('Failed to create event. Please try again.');
+                    } finally {
+                      setCreating(false);
+                    }
+                  }} 
+                  disabled={creating}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {creating ? 'Creating...' : 'Create Event'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Search */}
@@ -230,7 +256,7 @@ export function EventsPage() {
             </p>
             <Button
               onClick={() => setOpen(true)}
-              className="bg-[#ab4aba] text-white hover:bg-[#973aa8]"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Event

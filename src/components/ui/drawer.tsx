@@ -4,11 +4,13 @@ import { Drawer as DrawerPrimitive } from "vaul"
 import { cn } from "@/lib/utils"
 
 const Drawer = ({
-  shouldScaleBackground = true,
+  shouldScaleBackground = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
   <DrawerPrimitive.Root
     shouldScaleBackground={shouldScaleBackground}
+    modal={true}
+    direction="top"
     {...props}
   />
 )
@@ -26,7 +28,7 @@ const DrawerOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-50 bg-black/80", className)}
+    className={cn("fixed inset-0 z-50 bg-background/80 backdrop-blur-md", className)}
     {...props}
   />
 ))
@@ -40,13 +42,21 @@ const DrawerContent = React.forwardRef<
     <DrawerOverlay />
     <DrawerPrimitive.Content
       ref={ref}
+      data-vaul-no-drag
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        "fixed left-[50%] top-[50%] z-50 w-full max-w-lg max-h-[90vh] overflow-hidden",
+        "translate-x-[-50%] translate-y-[-50%]",
+        "flex flex-col rounded-lg border",
+        "bg-background shadow-2xl",
+        "opacity-100",
         className
       )}
+      style={{ 
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'hsl(var(--background))'
+      }}
       {...props}
     >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
