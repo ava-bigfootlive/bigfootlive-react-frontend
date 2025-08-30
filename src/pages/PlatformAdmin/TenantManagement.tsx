@@ -68,82 +68,13 @@ export default function TenantManagement() {
     try {
       setLoading(true);
       const response = await api.getTenants();
-      
-      // If backend returns empty or error, show sample data for demo
-      if (!response || response.length === 0) {
-        // Sample data for demonstration - remove when backend is fully implemented
-        const sampleTenants: Tenant[] = [
-          {
-            id: 'tenant-1',
-            name: 'Acme Corporation',
-            subdomain: 'acme',
-            status: 'active',
-            plan: 'pro',
-            created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-            user_count: 25,
-            storage_used: 15.2,
-            admin_email: 'admin@acme.com',
-          },
-          {
-            id: 'tenant-2',
-            name: 'Tech Startup Inc',
-            subdomain: 'techstartup',
-            status: 'active',
-            plan: 'starter',
-            created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            user_count: 8,
-            storage_used: 3.7,
-            admin_email: 'cto@techstartup.io',
-          },
-          {
-            id: 'tenant-3',
-            name: 'Enterprise Corp',
-            subdomain: 'enterprise',
-            status: 'active',
-            plan: 'enterprise',
-            created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-            user_count: 150,
-            storage_used: 85.5,
-            admin_email: 'it@enterprise.com',
-          },
-          {
-            id: 'tenant-4',
-            name: 'Beta Testers LLC',
-            subdomain: 'beta',
-            status: 'inactive',
-            plan: 'free',
-            created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-            user_count: 3,
-            storage_used: 0.5,
-            admin_email: 'test@beta.dev',
-          },
-        ];
-        setTenants(sampleTenants);
-        toast({
-          title: 'Info',
-          description: 'Showing sample data. Connect to backend for real data.',
-        });
-      } else {
-        setTenants(response);
-      }
+      setTenants(response || []);
     } catch (error) {
       console.error('Failed to fetch tenants:', error);
-      // Show sample data even on error for better UX
-      const sampleTenants: Tenant[] = [
-        {
-          id: 'demo-tenant',
-          name: 'Demo Organization',
-          subdomain: 'demo',
-          status: 'active',
-          plan: 'free',
-          created_at: new Date().toISOString(),
-          user_count: 1,
-        },
-      ];
-      setTenants(sampleTenants);
+      setTenants([]);
       toast({
-        title: 'Warning',
-        description: 'Using demo data. Backend connection unavailable.',
+        title: 'Error',
+        description: 'Failed to load tenants. Please try again later.',
         variant: 'destructive',
       });
     } finally {
@@ -432,7 +363,7 @@ export default function TenantManagement() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Acme Corporation"
+                placeholder="Company Name"
               />
             </div>
             <div>
@@ -441,7 +372,7 @@ export default function TenantManagement() {
                 id="subdomain"
                 value={formData.subdomain}
                 onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
-                placeholder="acme"
+                placeholder="company"
               />
             </div>
             <div>
@@ -451,7 +382,7 @@ export default function TenantManagement() {
                 type="email"
                 value={formData.admin_email}
                 onChange={(e) => setFormData({ ...formData, admin_email: e.target.value })}
-                placeholder="admin@acme.com"
+                placeholder="admin@company.com"
               />
             </div>
             <div>

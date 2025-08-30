@@ -27,9 +27,12 @@ export interface LiveEvent {
 }
 
 export interface CreateEventRequest {
-  title: string;
+  name?: string;  // Backend uses 'name' not 'title'
+  title?: string;  // Keep for backward compatibility
   description?: string;
   scheduled_start?: string;
+  start_date?: string;  // Backend expects this
+  end_date?: string;    // Backend expects this
   recording_enabled?: boolean;
   chat_enabled?: boolean;
   require_auth?: boolean;
@@ -73,7 +76,27 @@ class EventService {
    * Create a new live event
    */
   async createEvent(data: CreateEventRequest): Promise<LiveEvent> {
-    const response = await apiClient.post(this.baseUrl, data);
+    // Transform to match backend expectations
+    const backendData = {
+      name: data.name || data.title || 'Untitled Event',
+      description: data.description,
+      start_date: data.start_date || data.scheduled_start,
+      end_date: data.end_date || (data.start_date ? 
+        new Date(new Date(data.start_date).getTime() + 2 * 60 * 60 * 1000).toISOString() : 
+        new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()),
+      is_public: true,
+      requires_registration: false,
+      chat_enabled: data.chat_enabled ?? true,
+      recording_enabled: data.recording_enabled ?? false,
+      polls_enabled: true,
+      qa_enabled: true,
+      reactions_enabled: true,
+      container_cpu_limit: 1024,
+      container_memory_limit: 2048,
+      container_storage_limit: 10240
+    };
+    
+    const response = await apiClient.post(this.baseUrl, backendData);
 
     // Generate RTMPS URL
     if (response.stream_key) {
@@ -113,6 +136,11 @@ class EventService {
     params.append('limit', limit.toString());
 
     const response = await apiClient.get(`${this.baseUrl}?${params.toString()}`);
+    
+    // Handle null or empty response
+    if (!response || !response.items) {
+      return { items: [], total: 0 };
+    }
     
     // Add streaming URLs to each event
     response.items = response.items.map((event: LiveEvent) => {

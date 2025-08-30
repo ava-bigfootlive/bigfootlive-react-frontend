@@ -34,7 +34,7 @@ import Hls from 'hls.js';
 import api from '../services/api';
 import webSocketService from '../services/websocket';
 import type { StreamMetrics, ChatMessage } from '../services/websocket';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { cognitoService } from '@/lib/cognito';
 
 interface Event {
   id: string;

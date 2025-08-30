@@ -188,7 +188,8 @@ class MediaService {
   /**
    * Get user's media
    */
-  async getUserMedia(skip: number = 0, limit: number = 20): Promise<UserMediaResponse> {
+  async getUserMedia(page: number = 1, limit: number = 20): Promise<UserMediaResponse> {
+    const skip = (page - 1) * limit;
     return apiClient.get(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`);
   }
 
@@ -197,7 +198,7 @@ class MediaService {
    */
   buildHlsUrl(mediaId: string, tenantId?: string): string {
     // Use CloudFront CDN for HLS delivery
-    const cdnUrl = 'https://d39hsmqppuzm82.cloudfront.net';
+    const cdnUrl = 'https://d2dbuyze4zqbdy.cloudfront.net';
     const tenant = tenantId || 'default';
     return `${cdnUrl}/media/${tenant}/${mediaId}/master.m3u8`;
   }
@@ -206,7 +207,7 @@ class MediaService {
    * Build thumbnail URL
    */
   buildThumbnailUrl(mediaId: string, tenantId?: string, index: number = 0): string {
-    const cdnUrl = 'https://d39hsmqppuzm82.cloudfront.net';
+    const cdnUrl = 'https://d2dbuyze4zqbdy.cloudfront.net';
     const tenant = tenantId || 'default';
     return `${cdnUrl}/media/${tenant}/${mediaId}/thumbnails/thumb_${String(index).padStart(3, '0')}.jpg`;
   }

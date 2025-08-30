@@ -3,11 +3,11 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/context/theme-provider';
 import { Moon, Sun } from 'lucide-react';
 
 export default function ThemeTest() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
@@ -18,7 +18,7 @@ export default function ThemeTest() {
           <Button
             variant="outline"
             size="icon"
-            onClick={toggleTheme}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="relative"
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

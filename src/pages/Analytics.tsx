@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -63,24 +62,10 @@ export default function AnalyticsPage() {
   const { acknowledgeAlert } = useAnalyticsAlerts();
   const { generateReport, downloadUrl, isGenerating } = useAnalyticsExport();
 
-  // Sample data for charts (in real app, this would come from API)
-  const mockViewerData = Array.from({ length: 24 }, (_, i) => ({
-    timestamp: Date.now() - (23 - i) * 60 * 60 * 1000,
-    value: Math.floor(Math.random() * 1000) + 100,
-  }));
-
-  const mockEngagementData = Array.from({ length: 24 }, (_, i) => ({
-    timestamp: Date.now() - (23 - i) * 60 * 60 * 1000,
-    value: Math.floor(Math.random() * 40) + 40,
-  }));
-
-  const mockGeographicData = [
-    { country: 'United States', viewers: 1248, percentage: 45.2 },
-    { country: 'United Kingdom', viewers: 567, percentage: 20.5 },
-    { country: 'Canada', viewers: 432, percentage: 15.6 },
-    { country: 'Germany', viewers: 298, percentage: 10.8 },
-    { country: 'Others', viewers: 218, percentage: 7.9 },
-  ];
+  // Data arrays - would be populated from API
+  const viewerData: any[] = [];
+  const engagementData: any[] = [];
+  const geographicData: any[] = [];
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -113,10 +98,7 @@ export default function AnalyticsPage() {
     : 0;
 
   return (
-    <DashboardLayout 
-      title="Analytics Dashboard" 
-      subtitle="Comprehensive analytics for live and historical events"
-    >
+    <div className="p-6">
       <div className="space-y-6">
         {/* Connection Status & Alerts */}
         <div className="flex items-center justify-between">
@@ -300,16 +282,16 @@ export default function AnalyticsPage() {
             {/* Charts Overview */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ViewerTimeSeriesChart 
-                data={mockViewerData}
+                data={viewerData}
                 title="Viewer Trends (24h)"
                 showPeakLine={true}
               />
               <EngagementChart 
-                data={mockEngagementData}
+                data={engagementData}
                 title="Engagement Rate (24h)"
               />
-              <GeographicChart data={mockGeographicData} />
-              <RevenueChart data={mockViewerData.map(d => ({ ...d, value: d.value * 2.5 }))} />
+              <GeographicChart data={geographicData} />
+              <RevenueChart data={viewerData.map(d => ({ ...d, value: d.value * 2.5 }))} />
             </div>
           </TabsContent>
 
@@ -344,21 +326,21 @@ export default function AnalyticsPage() {
             {liveEvents.length > 0 && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ViewerTimeSeriesChart 
-                  data={mockViewerData}
+                  data={viewerData}
                   isLive={true}
                   title="Live Viewer Count"
                 />
                 <StreamQualityChart 
-                  bitrateData={mockViewerData}
-                  frameRateData={mockViewerData}
-                  latencyData={mockViewerData}
+                  bitrateData={viewerData}
+                  frameRateData={viewerData}
+                  latencyData={viewerData}
                 />
                 <ResourceUsageChart 
-                  cpuData={mockEngagementData}
-                  memoryData={mockEngagementData}
+                  cpuData={engagementData}
+                  memoryData={engagementData}
                 />
                 <EngagementChart 
-                  data={mockEngagementData}
+                  data={engagementData}
                   title="Real-time Engagement"
                 />
               </div>
@@ -486,6 +468,6 @@ export default function AnalyticsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

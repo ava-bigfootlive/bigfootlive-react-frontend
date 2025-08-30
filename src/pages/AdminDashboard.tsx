@@ -93,36 +93,12 @@ interface RevenueMetrics {
   revenue_growth: number;
 }
 
-// Sample data for charts
-const viewerTrendData = [
-  { time: '00:00', viewers: 450, bandwidth: 120 },
-  { time: '04:00', viewers: 380, bandwidth: 95 },
-  { time: '08:00', viewers: 720, bandwidth: 180 },
-  { time: '12:00', viewers: 1250, bandwidth: 310 },
-  { time: '16:00', viewers: 980, bandwidth: 245 },
-  { time: '20:00', viewers: 1450, bandwidth: 360 },
-  { time: '23:59', viewers: 680, bandwidth: 170 }
-];
+// Chart data - populated from API
+const viewerTrendData: { time: string; viewers: number; bandwidth: number; }[] = [];
 
-const eventDistribution = [
-  { name: 'Live Events', value: 35, color: '#10b981' },
-  { name: 'VOD', value: 45, color: '#3b82f6' },
-  { name: 'Scheduled', value: 20, color: '#f59e0b' }
-];
-
-const regionDistribution = [
-  { region: 'North America', viewers: 4500, revenue: 12500 },
-  { region: 'Europe', viewers: 3200, revenue: 8900 },
-  { region: 'Asia Pacific', viewers: 2800, revenue: 7200 },
-  { region: 'Latin America', viewers: 1200, revenue: 3100 },
-  { region: 'Africa', viewers: 800, revenue: 1800 }
-];
-
-const platformMetrics = [
-  { platform: 'Web', users: 65, color: '#3b82f6' },
-  { platform: 'Mobile', users: 25, color: '#10b981' },
-  { platform: 'Smart TV', users: 10, color: '#f59e0b' }
-];
+const eventDistribution: { name: string; value: number; color: string; }[] = [];
+const regionDistribution: { region: string; viewers: number; revenue: number; }[] = [];
+const platformMetrics: { platform: string; users: number; color: string; }[] = [];
 
 export default function AdminDashboard() {
   const { user } = useAuth();

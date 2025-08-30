@@ -653,7 +653,7 @@ export default function VODUpload() {
                       {asset.processing_status === 'completed' && asset.url ? (
                         <VideoThumbnail
                           src={asset.url.endsWith('.m3u8') ? asset.url : 
-                               `https://d39hsmqppuzm82.cloudfront.net/media/${asset.id}/master.m3u8`}
+                               `https://d2dbuyze4zqbdy.cloudfront.net/media/${asset.id}/master.m3u8`}
                           poster={asset.thumbnail_url || undefined}
                           className="w-full h-full"
                           showPlayButton={false}
@@ -764,7 +764,7 @@ export default function VODUpload() {
                                   <div className="aspect-video">
                                     <VideoPlayer
                                       src={asset.url.endsWith('.m3u8') ? asset.url : 
-                                           `https://d39hsmqppuzm82.cloudfront.net/media/${asset.id}/master.m3u8`}
+                                           `https://d2dbuyze4zqbdy.cloudfront.net/media/${asset.id}/master.m3u8`}
                                       poster={asset.thumbnail_url || undefined}
                                       title={asset.title}
                                       className="w-full h-full rounded-lg"

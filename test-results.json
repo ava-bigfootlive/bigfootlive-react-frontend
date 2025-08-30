@@ -48,14 +48,56 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
-        "id": "chromium",
-        "name": "chromium",
+        "id": "production-regression",
+        "name": "production-regression",
         "testDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests",
         "testIgnore": [],
         "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+          "**/production-regression.spec.ts"
         ],
-        "timeout": 10000
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/home/ava-io/repos/bigfootlive-react-frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "vod-upload",
+        "name": "vod-upload",
+        "testDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/vod-upload.spec.ts"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/home/ava-io/repos/bigfootlive-react-frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "live-streaming",
+        "name": "live-streaming",
+        "testDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/live-streaming.spec.ts"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/home/ava-io/repos/bigfootlive-react-frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "/home/ava-io/repos/bigfootlive-react-frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/production-regression.spec.ts"
+        ],
+        "timeout": 120000
       }
     ],
     "shard": null,
@@ -78,8 +120,8 @@
     }
   ],
   "stats": {
-    "startTime": "2025-08-27T08:35:20.508Z",
-    "duration": 120018.122,
+    "startTime": "2025-08-30T06:55:46.684Z",
+    "duration": 120021.143,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,

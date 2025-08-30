@@ -1,4 +1,4 @@
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { cognitoService } from '@/lib/cognito';
 import { errorHandler, AppError, ErrorType, ErrorSeverity } from '@/utils/errorHandler';
 import { toast } from '@/components/ui/use-toast';
 import { apiHealth } from './apiHealth';
@@ -28,10 +28,13 @@ class ApiClient {
 
     if (authenticated) {
       try {
-        const session = await fetchAuthSession();
-        const token = session.tokens?.accessToken?.toString();
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+        const accessToken = await cognitoService.getAccessToken();
+        
+        if (accessToken) {
+          headers['Authorization'] = `Bearer ${accessToken}`;
+          console.log('Added Authorization header with access token');
+        } else {
+          console.warn('No access token available - API request will likely fail with 401');
         }
       } catch (err) {
         console.error('Failed to get auth token:', err);
@@ -89,15 +92,26 @@ class ApiClient {
 
     try {
       const headers = await this.getHeaders(authenticated);
+      const finalHeaders = {
+        ...headers,
+        ...fetchOptions.headers,
+      };
       
       let response: Response;
       try {
-        response = await fetch(`${API_URL}${endpoint}`, {
-          ...fetchOptions,
+        const requestUrl = `${API_URL}${endpoint}`;
+        console.log('Making API request:', {
+          url: requestUrl,
+          method: fetchOptions.method || 'GET',
           headers: {
-            ...headers,
-            ...fetchOptions.headers,
-          },
+            ...finalHeaders,
+            'Authorization': finalHeaders['Authorization'] ? `Bearer ${finalHeaders['Authorization'].substring(7, 27)}...` : 'none'
+          }
+        });
+        
+        response = await fetch(requestUrl, {
+          ...fetchOptions,
+          headers: finalHeaders,
           signal: controller.signal
         });
       } catch (fetchError) {
@@ -109,12 +123,18 @@ class ApiClient {
 
       // Handle specific status codes
       if (!response.ok) {
-        // For 404/405/401 errors on certain endpoints, return empty data instead of throwing
-        // These are expected when backend endpoints don't exist yet or auth is missing
-        if (response.status === 404 || response.status === 405 || 
-            (response.status === 401 && (endpoint.includes('/events') || 
-                                         endpoint.includes('/media') || 
-                                         endpoint.includes('/playlist')))) {
+        // Log 401 errors to help debug authentication issues
+        if (response.status === 401) {
+          console.error(`API request to ${endpoint} returned 401 Unauthorized`);
+          console.error('Request headers included Authorization:', !!finalHeaders['Authorization']);
+          if (finalHeaders['Authorization']) {
+            console.error('Token preview:', finalHeaders['Authorization'].substring(0, 50) + '...');
+          }
+        }
+        
+        // For 404/405 errors on certain endpoints, return empty data instead of throwing
+        // But for 401, we should let it fail so we can debug the auth issue
+        if (response.status === 404 || response.status === 405) {
           // Record this error to prevent future attempts
           apiHealth.recordError(endpoint, response.status);
           // Don't log to console, just return empty response
@@ -288,16 +308,20 @@ class ApiClient {
   }
 
   private handleAuthError() {
-    // Clear local storage
-    localStorage.removeItem('authToken');
+    // Don't redirect if we're still initializing
+    // The auth context will handle redirects properly
+    console.warn('Auth error - token may be expired or missing');
     
-    // Redirect to login after a short delay
-    setTimeout(() => {
-      const currentPath = window.location.pathname;
-      if (currentPath !== '/login') {
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-      }
-    }, 1500);
+    // Clear local storage only if we're sure the token is invalid
+    // Don't clear it during initialization
+    const hasToken = localStorage.getItem('authToken');
+    if (hasToken) {
+      // Token exists but is invalid, clear it
+      localStorage.removeItem('authToken');
+    }
+    
+    // Don't redirect here - let the ProtectedRoute component handle it
+    // This prevents the flicker when auth is still initializing
   }
 
   // Return empty response for expected failures
@@ -659,10 +683,12 @@ class ApiClient {
   }
 
   async getUserMedia(page: number = 1, limit: number = 20): Promise<any> {
+    // Backend expects skip/limit, not page/limit
+    const skip = (page - 1) * limit;
     // Try the endpoint, but return empty data if it fails
-    return this.request(`/api/v1/media/user/media?page=${page}&limit=${limit}`, {
+    return this.request(`/api/v1/media/user/media?skip=${skip}&limit=${limit}`, {
       skipErrorHandler: false
-    }).catch(() => ({ items: [], total: 0 }));
+    }).catch(() => ({ items: [], total: 0, skip: 0, limit: limit }));
   }
 
   async getMedia(mediaId: string): Promise<any> {

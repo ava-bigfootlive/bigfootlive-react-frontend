@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { VideoPlayerGrid } from '@/components/VideoPlayer';
 import { VideoPlayer } from '@/components/VideoPlayer';
@@ -21,7 +22,8 @@ import {
   Copy,
   Trash2,
   Play,
-  FileVideo
+  FileVideo,
+  Upload
 } from 'lucide-react';
 import { apiClient } from '../services/api';
 import { toast } from 'sonner';
@@ -42,6 +44,7 @@ interface MediaAsset {
 }
 
 export default function MediaAssetsPage() {
+  const navigate = useNavigate();
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<MediaAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null);
@@ -84,7 +87,7 @@ export default function MediaAssetsPage() {
       const transformedAssets = mediaAssets.map((asset: any) => ({
         ...asset,
         url: asset.url || (asset.processing_status === 'completed' 
-          ? `https://d39hsmqppuzm82.cloudfront.net/media/${asset.id}/master.m3u8`
+          ? `https://d2dbuyze4zqbdy.cloudfront.net/media/${asset.id}/master.m3u8`
           : ''),
         processing_status: asset.processing_status === 'completed' ? 'completed' :
                           asset.processing_status === 'failed' ? 'failed' :
@@ -94,47 +97,7 @@ export default function MediaAssetsPage() {
       setAssets(transformedAssets);
     } catch (error) {
       console.error('Failed to load assets:', error);
-      // Load demo data
-      setAssets([
-        {
-          id: 'demo-1',
-          title: 'Sample Event Recording',
-          description: 'Live event from December 2024',
-          type: 'video/mp4',
-          url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          thumbnail_url: 'https://via.placeholder.com/640x360/1e40af/ffffff?text=Sample+Video',
-          processing_status: 'completed',
-          file_size: 52428800,
-          duration: 634,
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          metadata: { bitrate: '5000k', resolution: '1920x1080', fps: 30 }
-        },
-        {
-          id: 'demo-2',
-          title: 'Product Launch Stream',
-          description: 'Q4 2024 Product Launch',
-          type: 'video/mp4',
-          url: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-          thumbnail_url: 'https://via.placeholder.com/640x360/059669/ffffff?text=Product+Launch',
-          processing_status: 'completed',
-          file_size: 157286400,
-          duration: 1507,
-          created_at: new Date(Date.now() - 172800000).toISOString(),
-          metadata: { bitrate: '8000k', resolution: '3840x2160', fps: 60 }
-        },
-        {
-          id: 'demo-3',
-          title: 'Training Session',
-          description: 'Employee training webinar',
-          type: 'video/mp4',
-          url: '',
-          thumbnail_url: 'https://via.placeholder.com/640x360/dc2626/ffffff?text=Processing',
-          processing_status: 'processing',
-          file_size: 104857600,
-          duration: null,
-          created_at: new Date(Date.now() - 3600000).toISOString()
-        }
-      ]);
+      setAssets([]);
     } finally {
       if (showLoading) setIsLoading(false);
     }
@@ -298,6 +261,15 @@ export default function MediaAssetsPage() {
               </div>
 
               <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={() => navigate('/vod-upload')}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Video
+                </Button>
+                
                 <Button
                   size="sm"
                   variant="outline"

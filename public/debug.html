@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug React App</title>
+    <script>
+        // Capture all errors
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            document.getElementById('errors').innerHTML += '<div style="color:red">ERROR: ' + e.error.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            document.getElementById('errors').innerHTML += '<div style="color:orange">PROMISE: ' + e.reason + '</div>';
+        });
+        
+        // Override console.error
+        const originalError = console.error;
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            document.getElementById('errors').innerHTML += '<div style="color:red">CONSOLE: ' + args.join(' ') + '</div>';
+        };
+    </script>
+</head>
+<body>
+    <h1>React App Debug</h1>
+    <div id="errors" style="background:#f0f0f0;padding:10px;margin:10px;"></div>
+    <div id="root"></div>
+    
+    <script type="module">
+        document.getElementById('errors').innerHTML += '<div>Loading React app...</div>';
+        
+        try {
+            await import('/src/main.tsx');
+            document.getElementById('errors').innerHTML += '<div style="color:green">React app loaded successfully!</div>';
+        } catch (error) {
+            document.getElementById('errors').innerHTML += '<div style="color:red">Failed to load React: ' + error + '</div>';
+        }
+    </script>
+</body>
+</html>

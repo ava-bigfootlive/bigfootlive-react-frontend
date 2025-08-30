@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/context/theme-provider';
 import { Moon, Sun } from 'lucide-react';
 
 export default function UIComponentTest() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [switchStates, setSwitchStates] = useState({
     notifications: true,
     autoPlay: false,
@@ -24,7 +24,7 @@ export default function UIComponentTest() {
     }));
     
     if (key === 'darkMode') {
-      toggleTheme();
+      setTheme(theme === 'dark' ? 'light' : 'dark');
     }
   };
 

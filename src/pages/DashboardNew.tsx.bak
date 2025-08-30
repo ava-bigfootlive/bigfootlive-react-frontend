@@ -1,0 +1,414 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Radio,
+  Calendar,
+  BarChart3,
+  Upload,
+  Users,
+  PlayCircle,
+  TrendingUp,
+  Clock,
+  Activity,
+  Eye,
+  FileVideo,
+  DollarSign,
+  ArrowUpRight,
+  ArrowDownRight,
+  AlertCircle
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import eventService from '../services/eventService';
+import analyticsService from '../services/analytics';
+
+interface StatCard {
+  title: string;
+  value: string;
+  change: string;
+  trend: 'up' | 'down' | 'neutral';
+  icon: React.ElementType;
+}
+
+interface ActionCard {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  path: string;
+  color: string;
+}
+
+export default function DashboardNew() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<StatCard[]>([]);
+  const [recentEvents, setRecentEvents] = useState<any[]>([]);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch real data from API
+      const [eventsResponse, dashboardOverview] = await Promise.allSettled([
+        eventService.listEvents(undefined, 0, 10),
+        analyticsService.getDashboardOverview()
+      ]);
+
+      // Process events
+      if (eventsResponse.status === 'fulfilled') {
+        const events = eventsResponse.value.items || [];
+        setRecentEvents(events.slice(0, 3).map(event => ({
+          title: event.title,
+          status: event.status,
+          viewers: event.viewer_count || 0,
+          startTime: event.scheduled_start ? new Date(event.scheduled_start).toLocaleString() : 'Not scheduled'
+        })));
+      }
+
+      // Process dashboard overview
+      if (dashboardOverview.status === 'fulfilled') {
+        const data = dashboardOverview.value;
+        setDashboardData(data);
+        
+        // Create stats based on real data
+        const newStats: StatCard[] = [
+          {
+            title: 'Total Views',
+            value: data.totalViews?.toLocaleString() || '0',
+            change: data.trendingMetrics?.viewsChange 
+              ? `${data.trendingMetrics.viewsChange > 0 ? '+' : ''}${data.trendingMetrics.viewsChange.toFixed(1)}%`
+              : '0%',
+            trend: data.trendingMetrics?.viewsChange > 0 ? 'up' : data.trendingMetrics?.viewsChange < 0 ? 'down' : 'neutral',
+            icon: Eye,
+          },
+          {
+            title: 'Active Streams',
+            value: data.activeEvents?.toString() || '0',
+            change: '0',
+            trend: 'neutral',
+            icon: Radio,
+          },
+          {
+            title: 'Total Events',
+            value: data.totalEvents?.toString() || '0',
+            change: '0',
+            trend: 'neutral',
+            icon: PlayCircle,
+          },
+          {
+            title: 'Revenue',
+            value: `$${data.totalRevenue?.toFixed(2) || '0.00'}`,
+            change: data.trendingMetrics?.revenueChange 
+              ? `${data.trendingMetrics.revenueChange > 0 ? '+' : ''}${data.trendingMetrics.revenueChange.toFixed(1)}%`
+              : '0%',
+            trend: data.trendingMetrics?.revenueChange > 0 ? 'up' : data.trendingMetrics?.revenueChange < 0 ? 'down' : 'neutral',
+            icon: DollarSign,
+          },
+        ];
+        setStats(newStats);
+      } else {
+        // Set default empty stats if API fails
+        setStats([
+          { title: 'Total Views', value: '0', change: '0%', trend: 'neutral', icon: Eye },
+          { title: 'Active Streams', value: '0', change: '0', trend: 'neutral', icon: Radio },
+          { title: 'Total Events', value: '0', change: '0', trend: 'neutral', icon: PlayCircle },
+          { title: 'Revenue', value: '$0.00', change: '0%', trend: 'neutral', icon: DollarSign },
+        ]);
+      }
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError('Failed to load dashboard data');
+      // Set default empty stats on error
+      setStats([
+        { title: 'Total Views', value: '0', change: '0%', trend: 'neutral', icon: Eye },
+        { title: 'Active Streams', value: '0', change: '0', trend: 'neutral', icon: Radio },
+        { title: 'Total Events', value: '0', change: '0', trend: 'neutral', icon: PlayCircle },
+        { title: 'Revenue', value: '$0.00', change: '0%', trend: 'neutral', icon: DollarSign },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const quickActions: ActionCard[] = [
+    {
+      title: 'Go Live',
+      description: 'Start streaming immediately',
+      icon: Radio,
+      path: '/streaming/live',
+      color: 'from-red-500 to-pink-500',
+    },
+    {
+      title: 'Schedule Event',
+      description: 'Plan your next stream',
+      icon: Calendar,
+      path: '/events',
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      title: 'Upload Content',
+      description: 'Add videos to your library',
+      icon: Upload,
+      path: '/media-assets',
+      color: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: 'View Analytics',
+      description: 'Track your performance',
+      icon: BarChart3,
+      path: '/analytics',
+      color: 'from-purple-500 to-indigo-500',
+    },
+  ];
+
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'live':
+        return 'bg-red-500';
+      case 'scheduled':
+        return 'bg-blue-500';
+      case 'completed':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Welcome back, {user?.given_name || user?.firstName || 'User'}
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Here's what's happening with your streams today.
+        </p>
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {loading ? (
+          // Loading skeletons
+          [...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-32 mb-2" />
+                <Skeleton className="h-3 w-20" />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.title}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {stat.title}
+                </CardTitle>
+                <Icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  {stat.trend === 'up' ? (
+                    <ArrowUpRight className="h-3 w-3 text-green-500" />
+                  ) : stat.trend === 'down' ? (
+                    <ArrowDownRight className="h-3 w-3 text-red-500" />
+                  ) : null}
+                  <span className={cn(
+                    stat.trend === 'up' && 'text-green-500',
+                    stat.trend === 'down' && 'text-red-500'
+                  )}>
+                    {stat.change}
+                  </span>
+                  <span>from last month</span>
+                </p>
+              </CardContent>
+            </Card>
+            );
+          })
+        )}
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Card
+                key={action.title}
+                className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1"
+                onClick={() => navigate(action.path)}
+              >
+                <CardHeader>
+                  <div className={cn(
+                    'w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center text-white mb-4',
+                    action.color
+                  )}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <CardTitle className="text-lg">{action.title}</CardTitle>
+                  <CardDescription>{action.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Events and Activity */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Recent Events */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Events</CardTitle>
+            <CardDescription>Your latest streaming activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : recentEvents.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Radio className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>No recent events</p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => navigate('/events')}
+                >
+                  Create Your First Event
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentEvents.map((event, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      'w-2 h-2 rounded-full',
+                      getStatusColor(event.status)
+                    )} />
+                    <div>
+                      <p className="font-medium">{event.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {event.startTime}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium capitalize">{event.status}</p>
+                    {event.viewers > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        {event.viewers} viewers
+                      </p>
+                    )}
+                  </div>
+                </div>
+                ))}
+              </div>
+            )}
+            <Button 
+              variant="outline" 
+              className="w-full mt-4"
+              onClick={() => navigate('/events')}
+            >
+              View All Events
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Performance Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Performance Overview</CardTitle>
+            <CardDescription>Last 7 days activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Total Events</span>
+                  </div>
+                  <span className="text-sm font-medium">{dashboardData?.totalEvents || 0}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Total Views</span>
+                  </div>
+                  <span className="text-sm font-medium">{dashboardData?.totalViews?.toLocaleString() || 0}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Active Streams</span>
+                  </div>
+                  <span className="text-sm font-medium">{dashboardData?.activeEvents || 0}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileVideo className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Top Events</span>
+                  </div>
+                  <span className="text-sm font-medium">{dashboardData?.topEvents?.length || 0}</span>
+                </div>
+              </div>
+            )}
+            <Button 
+              variant="outline" 
+              className="w-full mt-4"
+              onClick={() => navigate('/analytics')}
+            >
+              View Detailed Analytics
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

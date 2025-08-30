@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,15 +35,9 @@ import {
 import api from '../services/api';
 import { cn } from '@/lib/utils';
 
-// Generate mock chart data
+// Generate empty chart data (real app would fetch from API)
 const generateChartData = () => {
-  const now = new Date();
-  return Array.from({ length: 24 }, (_, i) => ({
-    time: `${i}:00`,
-    viewers: Math.floor(Math.random() * 5000) + 1000,
-    engagement: Math.floor(Math.random() * 100),
-    revenue: Math.floor(Math.random() * 10000) + 2000
-  }));
+  return [];
 };
 
 interface DashboardStats {
@@ -91,8 +84,8 @@ export default function DashboardEnhanced() {
         activeStreams,
         totalViewers,
         upcomingEvents,
-        revenue: Math.floor(Math.random() * 50000) + 10000,
-        engagement: Math.floor(Math.random() * 100)
+        revenue: 0,
+        engagement: 0
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -146,7 +139,7 @@ export default function DashboardEnhanced() {
   ];
 
   return (
-    <DashboardLayout title="Enhanced Dashboard">
+    <div className="p-6">
       <div className="space-y-8 animate-fade-in bg-gradient-to-br from-slate-50/50 via-white/50 to-purple-50/30 dark:from-gray-950/50 dark:via-gray-900/50 dark:to-purple-950/20 min-h-screen -m-6 p-6 rounded-xl">
         {/* Header Section */}
         <div className="relative overflow-hidden">
@@ -615,6 +608,6 @@ export default function DashboardEnhanced() {
           })}
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

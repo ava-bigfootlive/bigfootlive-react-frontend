@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Dialog,
   DialogContent,
@@ -20,20 +25,39 @@ import {
   Radio,
   Users,
   Play,
-  Clock
+  Clock,
+  Video,
+  Settings,
+  Trash2,
+  Edit,
+  Copy,
+  ExternalLink,
+  AlertCircle,
+  CheckCircle2,
+  RefreshCw,
+  Filter,
+  LayoutGrid,
+  List,
+  Activity
 } from 'lucide-react';
 import eventService from '../services/eventService';
 import { format } from 'date-fns';
-import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { toast } from 'sonner';
 
 interface Event {
   id: string;
-  title: string;
+  name?: string;  // Backend uses 'name'
+  title?: string;  // For compatibility
   description?: string;
-  status: 'scheduled' | 'live' | 'ended' | 'completed' | 'cancelled';
+  status?: 'scheduled' | 'live' | 'ended' | 'completed' | 'cancelled';
+  container_status?: string;  // Backend field
   scheduled_start?: string;
+  start_date?: string;  // Backend field
   viewer_count?: number;
+  stream_url?: string;
+  rtmp_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export function EventsPage() {
@@ -43,17 +67,22 @@ export function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
-  // Form state for drawer
+  // Form state for dialog
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    scheduledStart: '',
-    scheduledEnd: ''
+    scheduledStart: undefined as Date | undefined,
+    scheduledEnd: undefined as Date | undefined
   });
 
   useEffect(() => {
     loadEvents();
+    // Auto-refresh for live events
+    const interval = setInterval(loadEvents, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const loadEvents = async () => {
@@ -72,26 +101,261 @@ export function EventsPage() {
     }
   };
 
-  const filteredEvents = events.filter(event =>
-    event.title?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleCreateEvent = async () => {
+    if (!formData.title) {
+      toast.error('Please enter an event title');
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await eventService.createEvent({
+        title: formData.title,
+        description: formData.description,
+        scheduled_start: formData.scheduledStart?.toISOString(),
+        end_date: formData.scheduledEnd?.toISOString()
+      });
+      
+      toast.success('Event created successfully');
+      setOpen(false);
+      setFormData({
+        title: '',
+        description: '',
+        scheduledStart: undefined,
+        scheduledEnd: undefined
+      });
+      loadEvents();
+    } catch (err) {
+      console.error('Failed to create event:', err);
+      toast.error('Failed to create event');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!confirm('Are you sure you want to delete this event?')) return;
+    
+    try {
+      await eventService.deleteEvent(eventId);
+      toast.success('Event deleted successfully');
+      loadEvents();
+    } catch (err) {
+      console.error('Failed to delete event:', err);
+      toast.error('Failed to delete event');
+    }
+  };
+
+  const getEventStatus = (event: Event) => {
+    return event.status || 'scheduled';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'live':
+        return 'bg-red-500';
+      case 'scheduled':
+        return 'bg-blue-500';
+      case 'ended':
+      case 'completed':
+        return 'bg-gray-500';
+      case 'cancelled':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-400';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'live':
+        return <Radio className="h-4 w-4" />;
+      case 'scheduled':
+        return <Clock className="h-4 w-4" />;
+      case 'ended':
+      case 'completed':
+        return <CheckCircle2 className="h-4 w-4" />;
+      case 'cancelled':
+        return <AlertCircle className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
+    }
+  };
+
+  // Filter events based on tab and search
+  const getFilteredEvents = () => {
+    let filtered = events;
+    
+    // Filter by tab
+    switch (selectedTab) {
+      case 'live':
+        filtered = events.filter(e => getEventStatus(e) === 'live');
+        break;
+      case 'scheduled':
+        filtered = events.filter(e => getEventStatus(e) === 'scheduled');
+        break;
+      case 'past':
+        filtered = events.filter(e => ['ended', 'completed'].includes(getEventStatus(e)));
+        break;
+      case 'cancelled':
+        filtered = events.filter(e => getEventStatus(e) === 'cancelled');
+        break;
+      // 'all' shows everything
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(event =>
+        (event.name || event.title || '')?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.description || '')?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
+  const filteredEvents = getFilteredEvents();
+
+  const EventCard = ({ event }: { event: Event }) => {
+    const status = getEventStatus(event);
+    const eventDate = event.scheduled_start || event.start_date;
+    
+    return (
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/events/${event.id}`)}>
+        <CardHeader className="pb-4">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1 flex-1">
+              <CardTitle className="text-lg">
+                {event.name || event.title || 'Untitled Event'}
+              </CardTitle>
+              <CardDescription className="line-clamp-2">
+                {event.description || 'No description'}
+              </CardDescription>
+            </div>
+            <Badge className={`${getStatusColor(status)} text-white ml-2`}>
+              <span className="flex items-center gap-1">
+                {getStatusIcon(status)}
+                {status}
+              </span>
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-4">
+              {eventDate && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {format(new Date(eventDate), 'MMM d, yyyy')}
+                </span>
+              )}
+              {event.viewer_count !== undefined && (
+                <span className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {event.viewer_count} viewers
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/events/${event.id}/edit`);
+                }}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteEvent(event.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const EventListItem = ({ event }: { event: Event }) => {
+    const status = getEventStatus(event);
+    const eventDate = event.scheduled_start || event.start_date;
+    
+    return (
+      <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+           onClick={() => navigate(`/events/${event.id}`)}>
+        <div className="flex items-center gap-4">
+          <div className={`p-2 rounded-lg ${getStatusColor(status)} bg-opacity-10`}>
+            {getStatusIcon(status)}
+          </div>
+          <div>
+            <h3 className="font-medium">{event.name || event.title || 'Untitled Event'}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              {event.description || 'No description'}
+            </p>
+            <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+              {eventDate && (
+                <span>{format(new Date(eventDate), 'MMM d, yyyy h:mm a')}</span>
+              )}
+              {event.viewer_count !== undefined && (
+                <span>{event.viewer_count} viewers</span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className={`${getStatusColor(status)} text-white`}>
+            {status}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/events/${event.id}/edit`);
+            }}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteEvent(event.id);
+            }}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <DashboardLayout title="Events">
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Events
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Manage your streaming events
-            </p>
-          </div>
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Events</h1>
+          <p className="text-muted-foreground">
+            Manage your streaming events
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={loadEvents}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Event
               </Button>
@@ -129,21 +393,19 @@ export function EventsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="start">Start Time</Label>
-                    <Input
-                      id="start"
-                      type="datetime-local"
-                      value={formData.scheduledStart}
-                      onChange={(e) => setFormData({...formData, scheduledStart: e.target.value})}
+                    <DateTimePicker
+                      date={formData.scheduledStart}
+                      setDate={(date) => setFormData({...formData, scheduledStart: date})}
+                      placeholder="Select start time"
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="end">End Time</Label>
-                    <Input
-                      id="end"
-                      type="datetime-local"
-                      value={formData.scheduledEnd}
-                      onChange={(e) => setFormData({...formData, scheduledEnd: e.target.value})}
+                    <DateTimePicker
+                      date={formData.scheduledEnd}
+                      setDate={(date) => setFormData({...formData, scheduledEnd: date})}
+                      placeholder="Select end time"
                     />
                   </div>
                 </div>
@@ -153,117 +415,122 @@ export function EventsPage() {
                 <Button variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button 
-                  onClick={async () => {
-                    try {
-                      // Validate required fields
-                      if (!formData.title.trim()) {
-                        toast.error('Event title is required');
-                        return;
-                      }
-
-                      setCreating(true);
-
-                      // Create the event via API
-                      await eventService.createEvent({
-                        title: formData.title,
-                        description: formData.description,
-                        scheduled_start: formData.scheduledStart,
-                        recording_enabled: true,
-                        chat_enabled: true
-                      });
-
-                      toast.success('Event created successfully!');
-                      setOpen(false);
-                      setFormData({ title: '', description: '', scheduledStart: '', scheduledEnd: '' });
-                      await loadEvents(); // Reload the events list
-                    } catch (error) {
-                      console.error('Failed to create event:', error);
-                      toast.error('Failed to create event. Please try again.');
-                    } finally {
-                      setCreating(false);
-                    }
-                  }} 
-                  disabled={creating}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                >
+                <Button onClick={handleCreateEvent} disabled={creating}>
                   {creating ? 'Creating...' : 'Create Event'}
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
+      </div>
 
-        {/* Search */}
-        <div className="relative mb-6 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      {/* Search and View Controls */}
+      <div className="flex items-center justify-between mb-6 gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            type="text"
             placeholder="Search events..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 border-gray-200 dark:border-gray-800"
+            className="pl-10"
           />
         </div>
-
-        {/* Events Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-gray-500">
-            <Clock className="mr-2 h-5 w-5 animate-spin" />
-            Loading...
-          </div>
-        ) : filteredEvents.length > 0 ? (
-          <div className="grid gap-4">
-            {filteredEvents.map((event) => (
-              <button
-                key={event.id}
-                onClick={() => navigate(`/streaming/live?event=${event.id}`)}
-                className="w-full text-left p-6 rounded-lg border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-all"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                        {event.title}
-                      </h3>
-                      {event.status === 'live' && (
-                        <span className="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-950/30 text-red-600 text-xs rounded-full">
-                          <Radio className="h-3 w-3" />
-                          Live
-                        </span>
-                      )}
-                    </div>
-                    {event.scheduled_start && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {format(new Date(event.scheduled_start), 'MMM d, h:mm a')}
-                      </p>
-                    )}
-                  </div>
-                  {event.status === 'scheduled' && (
-                    <Play className="h-5 w-5 text-gray-400" />
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No events
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Create your first event to get started
-            </p>
-            <Button
-              onClick={() => setOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Event
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('grid')}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-    </DashboardLayout>
+
+      {/* Tabs for Event Categories */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="all" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            All Events
+            <Badge variant="secondary" className="ml-1">
+              {events.length}
+            </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="live" className="flex items-center gap-2">
+            <Radio className="h-4 w-4" />
+            Live
+            <Badge variant="secondary" className="ml-1">
+              {events.filter(e => getEventStatus(e) === 'live').length}
+            </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="scheduled" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Scheduled
+            <Badge variant="secondary" className="ml-1">
+              {events.filter(e => getEventStatus(e) === 'scheduled').length}
+            </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="past" className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4" />
+            Past
+            <Badge variant="secondary" className="ml-1">
+              {events.filter(e => ['ended', 'completed'].includes(getEventStatus(e))).length}
+            </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="cancelled" className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Cancelled
+            <Badge variant="secondary" className="ml-1">
+              {events.filter(e => getEventStatus(e) === 'cancelled').length}
+            </Badge>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Tab Content */}
+        <TabsContent value={selectedTab} className="space-y-4">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center gap-2">
+                <RefreshCw className="h-5 w-5 animate-spin" />
+                Loading events...
+              </div>
+            </div>
+          ) : filteredEvents.length === 0 ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {searchQuery
+                  ? `No events found matching "${searchQuery}"`
+                  : selectedTab === 'all'
+                  ? 'No events yet. Create your first event to get started!'
+                  : `No ${selectedTab} events`}
+              </AlertDescription>
+            </Alert>
+          ) : viewMode === 'grid' ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filteredEvents.map((event) => (
+                <EventListItem key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
+
+export default EventsPage;

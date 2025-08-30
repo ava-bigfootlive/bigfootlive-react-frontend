@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Debug</title>
+    <script src="https://unpkg.com/amazon-cognito-identity-js@6.3.0/dist/amazon-cognito-identity.min.js"></script>
+</head>
+<body>
+    <h1>Cognito Token Debug</h1>
+    <button onclick="checkTokens()">Check Tokens</button>
+    <button onclick="testAPI()">Test API Call</button>
+    <pre id="output"></pre>
+
+    <script>
+        const poolData = {
+            UserPoolId: 'us-west-1_6IUovRAM1',
+            ClientId: '1vk1puqortjm4kk08kh0u1otaj'
+        };
+
+        function checkTokens() {
+            const output = document.getElementById('output');
+            let info = '';
+            
+            // Check all localStorage keys
+            const cognitoKeys = Object.keys(localStorage).filter(k => k.includes('CognitoIdentityServiceProvider'));
+            info += 'Cognito Keys in localStorage:\n' + cognitoKeys.join('\n') + '\n\n';
+            
+            // Try to get current user
+            const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            const cognitoUser = userPool.getCurrentUser();
+            
+            if (cognitoUser) {
+                info += 'Current User: ' + cognitoUser.getUsername() + '\n\n';
+                
+                cognitoUser.getSession((err, session) => {
+                    if (err) {
+                        info += 'Session Error: ' + err + '\n';
+                        output.textContent = info;
+                        return;
+                    }
+                    
+                    if (session) {
+                        info += 'Session Valid: ' + session.isValid() + '\n';
+                        info += 'Access Token: ' + session.getAccessToken().getJwtToken().substring(0, 50) + '...\n';
+                        info += 'ID Token: ' + session.getIdToken().getJwtToken().substring(0, 50) + '...\n';
+                        output.textContent = info;
+                    }
+                });
+            } else {
+                info += 'No current user found\n';
+                output.textContent = info;
+            }
+        }
+
+        async function testAPI() {
+            const output = document.getElementById('output');
+            const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            const cognitoUser = userPool.getCurrentUser();
+            
+            if (!cognitoUser) {
+                output.textContent = 'No user logged in';
+                return;
+            }
+            
+            cognitoUser.getSession(async (err, session) => {
+                if (err || !session) {
+                    output.textContent = 'No valid session';
+                    return;
+                }
+                
+                const accessToken = session.getAccessToken().getJwtToken();
+                const idToken = session.getIdToken().getJwtToken();
+                
+                // Test with access token
+                try {
+                    const response1 = await fetch('https://api.bigfootlive.io/api/v1/events/', {
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    output.textContent += '\n\nAccess Token Test:\n';
+                    output.textContent += 'Status: ' + response1.status + '\n';
+                    output.textContent += 'Response: ' + await response1.text() + '\n';
+                } catch (e) {
+                    output.textContent += '\n\nAccess Token Error: ' + e + '\n';
+                }
+                
+                // Test with ID token
+                try {
+                    const response2 = await fetch('https://api.bigfootlive.io/api/v1/events/', {
+                        headers: {
+                            'Authorization': 'Bearer ' + idToken,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    output.textContent += '\n\nID Token Test:\n';
+                    output.textContent += 'Status: ' + response2.status + '\n';
+                    output.textContent += 'Response: ' + await response2.text() + '\n';
+                } catch (e) {
+                    output.textContent += '\n\nID Token Error: ' + e + '\n';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

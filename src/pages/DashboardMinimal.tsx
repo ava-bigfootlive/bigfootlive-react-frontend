@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DashboardLayout } from '../components/Layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { 
   Radio,
@@ -73,10 +72,9 @@ export default function DashboardMinimal() {
   ];
 
   return (
-    <DashboardLayout title="Dashboard">
-      <div className="p-6">
-        {/* Welcome Header */}
-        <div className="mb-8">
+    <div className="p-6">
+      {/* Welcome Header */}
+      <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
             Welcome back{user?.email ? `, ${user.email.split('@')[0]}` : ''}
           </h1>
@@ -168,6 +166,5 @@ export default function DashboardMinimal() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

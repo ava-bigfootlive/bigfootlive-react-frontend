@@ -1,0 +1,9 @@
+{
+  "Auth": {
+    "Cognito": {
+      "userPoolId": "us-west-1_XXXXXXXXX",
+      "userPoolClientId": "XXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "identityPoolId": "us-west-1:XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    }
+  }
+}
