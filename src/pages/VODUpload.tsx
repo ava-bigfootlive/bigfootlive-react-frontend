@@ -101,7 +101,7 @@ export default function VODUpload() {
     if (showLoading) setIsLoading(true);
     
     try {
-      const response = await mediaService.getUserMedia((currentPage - 1) * assetsPerPage, assetsPerPage);
+      const response = await mediaService.getUserMedia(currentPage, assetsPerPage);
       setAssets(response.items || []);
       setTotalAssets(response.total || 0);
     } catch (error: any) {
