@@ -15,7 +15,6 @@ import {
   Filter,
   Star,
   Crown,
-  Heart,
   AlertTriangle,
   MessageCircle,
   Users
@@ -56,7 +55,6 @@ import {
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 // import data from '@emoji-mart/data';
 // import Picker from '@emoji-mart/react';
@@ -111,7 +109,7 @@ const LiveChat: React.FC<LiveChatProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
+  const [mentionSuggestions] = useState<User[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [pinnedMessage, setPinnedMessage] = useState<Message | null>(null);
   const [slowMode, setSlowMode] = useState(false);
@@ -120,7 +118,6 @@ const LiveChat: React.FC<LiveChatProps> = ({
   const [emoteOnly, setEmoteOnly] = useState(false);
   const [profanityFilter, setProfanityFilter] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
   const [compactMode, setCompactMode] = useState(false);

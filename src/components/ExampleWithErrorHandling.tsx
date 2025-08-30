@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { apiClient } from '@/services/api';
 import { webSocketService } from '@/services/websocket';
-import { errorHandler, handleError } from '@/utils/errorHandler';
+import { handleError } from '@/utils/errorHandler';
 import { formErrorHandler, FormErrors } from '@/utils/formErrorHandler';
 import { networkMonitor, queueAction } from '@/utils/networkMonitor';
 import { toast } from '@/components/ui/use-toast';

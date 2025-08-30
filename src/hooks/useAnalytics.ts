@@ -270,7 +270,7 @@ export function useLiveEventAnalytics(eventId: string) {
   // Initialize metrics from initial fetch
   useEffect(() => {
     if (initialMetrics && !liveMetrics) {
-      setLiveMetrics(initialMetrics);
+      setLiveMetrics(initialMetrics as any);
     }
   }, [initialMetrics, liveMetrics]);
 
@@ -290,7 +290,7 @@ export function useHistoricalEventAnalytics(eventId: string) {
     error,
   } = useQuery({
     queryKey: ['analytics', 'historical-metrics', eventId],
-    queryFn: () => analyticsService.getHistoricalMetrics(eventId),
+    queryFn: () => analyticsService.getHistoricalMetrics(eventId, {}),
     enabled: !!eventId,
   });
 
@@ -307,7 +307,7 @@ export function useHistoricalEventAnalytics(eventId: string) {
     data: migrationStatus,
   } = useQuery({
     queryKey: ['analytics', 'migration-status', eventId],
-    queryFn: () => analyticsService.getDataMigrationStatus(eventId),
+    queryFn: () => analyticsService.getDataMigrationStatus(),
     enabled: !!eventId,
     refetchInterval: 10000, // Check migration status every 10 seconds
   });

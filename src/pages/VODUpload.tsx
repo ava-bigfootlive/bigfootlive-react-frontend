@@ -455,7 +455,7 @@ export default function VODUpload() {
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Maximum file size: {MAX_FILE_SIZE / (1024 * 1024 * 1024)}GB per file
               </p>
-              <Button onClick={() => fileInputRef.current?.click()}>
+              <Button variant="outline" type="button">
                 Choose Files
               </Button>
               <input

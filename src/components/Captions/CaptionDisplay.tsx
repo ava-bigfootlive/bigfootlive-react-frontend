@@ -14,13 +14,6 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Settings,
-  Volume2,
-  VolumeX,
-  Maximize2,
-  Minimize2,
-  Move,
-  Type,
-  Palette,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -118,7 +111,7 @@ const CaptionDisplay: React.FC<CaptionDisplayProps> = ({
 
   // WebSocket for live captions
   // Use WebSocket only when needed for captions, silent mode
-  const { isConnected, messages, subscribe } = useWebSocket({ autoConnect: false, silent: true });
+  const { isConnected, subscribe } = useWebSocket({ autoConnect: false, silent: true });
   
   useEffect(() => {
     if (!sessionId) return;

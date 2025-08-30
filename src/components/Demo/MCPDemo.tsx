@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Cloud, Server, Code, Package, Zap, Blocks, 
+  Cloud, Server, Code, Blocks, 
   TestTube, Github, Palette, Database, Globe
 } from 'lucide-react';
 

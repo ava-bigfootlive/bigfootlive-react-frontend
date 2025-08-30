@@ -10,7 +10,6 @@ import VODUpload from './pages/VODUpload';
 import Analytics from './pages/Analytics';
 import Chat from './pages/Chat';
 import Settings from './pages/Settings/Settings';
-import Layout from './components/Layout';
 
 function App() {
   return (

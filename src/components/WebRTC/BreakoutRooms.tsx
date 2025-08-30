@@ -572,7 +572,7 @@ export const BreakoutRooms: React.FC<BreakoutRoomsProps> = ({
     const participants = [...unassignedParticipants];
     if (participants.length === 0) return;
     
-    let assignments: { [roomId: string]: WebRTCPeer[] } = {};
+    const assignments: { [roomId: string]: WebRTCPeer[] } = {};
     
     switch (algorithm) {
       case 'random':

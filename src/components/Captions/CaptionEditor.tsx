@@ -13,17 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   Edit3,
   Save,
@@ -33,15 +24,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Search,
-  Filter,
-  Download,
-  Undo2,
-  Redo2,
-  Volume2,
-  Play,
-  Pause,
-  SkipForward,
-  SkipBack
+  Download
 } from 'lucide-react';
 
 // Types
@@ -104,21 +87,15 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({
   const [selectedSegments, setSelectedSegments] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState<'all' | 'needs_review' | 'corrected' | 'low_confidence'>('all');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoSave, setAutoSave] = useState(true);
   const [showTimingEditor, setShowTimingEditor] = useState(false);
 
   // Refs
   const segmentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const undoStack = useRef<CaptionSegment[]>([]);
-  const redoStack = useRef<CaptionSegment[]>([]);
 
   // WebSocket connections
   // Use WebSocket only when needed for captions, silent mode
-  const { isConnected: isLiveConnected, messages: liveMessages, subscribe } = useWebSocket({ autoConnect: false, silent: true });
-  const isCorrectionConnected = isLiveConnected;
+  const { isConnected: isLiveConnected, subscribe } = useWebSocket({ autoConnect: false, silent: true });
   
   // Setup WebSocket subscriptions
   useEffect(() => {

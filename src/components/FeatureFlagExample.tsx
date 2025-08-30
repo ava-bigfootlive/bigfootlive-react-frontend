@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { useFeatureFlag, useTypedFeatureFlag, withFeatureFlag } from '@/hooks/useFeatureFlag';
+import { useTypedFeatureFlag, withFeatureFlag } from '@/hooks/useFeatureFlag';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import {
   Users, 
   MessageSquare, 
   BarChart, 
-  Palette, 
+ 
   Cloud,
   Shield,
   FlaskConical,
@@ -25,7 +25,7 @@ import {
  */
 export function EventsPageWithFeatureFlags() {
   // Check if WebRTC multi-presenter is enabled
-  const { isEnabled: hasMultiPresenter, loading: multiPresenterLoading } = useTypedFeatureFlag(
+  const { isEnabled: hasMultiPresenter } = useTypedFeatureFlag(
     'premium.webrtc.multipresenter'
   );
   

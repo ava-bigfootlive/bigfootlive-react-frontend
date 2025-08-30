@@ -262,7 +262,7 @@ export default function AnalyticsPage() {
                         ${formatNumber(dashboardOverview?.totalRevenue || 0)}
                       </p>
                       <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                        +{dashboardOverview?.trendingMetrics?.revenueChange || 0}% this period
+                        +{(dashboardOverview?.trendingMetrics as any)?.revenueChange || 0}% this period
                       </p>
                     </div>
                     <DollarSign className="h-8 w-8 text-green-600" />
